@@ -1,4 +1,4 @@
-import { Outlet } from "react-router";
+import { Outlet, redirect } from "react-router";
 import { Navbar } from "../components/Navbar";
 import { apiFetch } from "../utils/api";
 import type { Route } from "./+types/student-layout";
@@ -11,11 +11,12 @@ export async function clientLoader() {
   try {
     const data = await apiFetch("/auth/me");
     if (data.user?.role !== "student") {
-      throw new Response("Forbidden", { status: 403 });
+      throw redirect("/login");
     }
     return { user: data.user };
-  } catch {
-    throw new Response("", { status: 302, headers: { Location: "/login" } });
+  } catch (err: any) {
+    if (err instanceof Response) throw err;
+    throw redirect("/login");
   }
 }
 
@@ -25,7 +26,7 @@ export default function StudentLayout({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <Navbar userName={user.name} role="student" />
-      <main className="max-w-6xl mx-auto px-6 py-12">
+      <main className="max-w-6xl mx-auto px-6 py-12 opacity-0 animate-reveal-up">
         <Outlet context={{ user }} />
       </main>
     </>

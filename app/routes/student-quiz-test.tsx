@@ -157,10 +157,10 @@ export default function StudentQuizTest({ loaderData }: Route.ComponentProps) {
   return (
     <div className="bg-slate-50 min-h-screen text-right font-[Cairo] pb-24">
       {/* Top Bar (Fixed) */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm opacity-0 animate-reveal-down">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between flex-row-reverse">
           <div>
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-indigo-50 text-indigo-700 mb-1 border border-indigo-100">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-indigo-50 text-indigo-700 mb-1 border border-indigo-100 uppercase tracking-wide">
               {quiz.title}
             </span>
           </div>
@@ -173,7 +173,7 @@ export default function StudentQuizTest({ loaderData }: Route.ComponentProps) {
         </div>
         
         {violationCount > 0 && (
-          <div className="bg-rose-500 text-white text-center py-2 text-sm font-bold">
+          <div className="bg-rose-500 text-white text-center py-2 text-sm font-bold animate-pulse">
             ⚠️ النظام يسجل خروجك من صفحة الاختبار ({violationCount}/3 تحذيرات). سيتم التسليم التلقائي في المرة الثالثة.
           </div>
         )}
@@ -182,17 +182,23 @@ export default function StudentQuizTest({ loaderData }: Route.ComponentProps) {
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="space-y-8">
           {quiz.questions.map((q, i) => (
-            <div key={q.id} className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 lg:p-8" id={`q-${i}`}>
+            <div 
+              key={q.id} 
+              className={`bg-white border border-slate-200 rounded-2xl shadow-sm p-6 lg:p-8 opacity-0 animate-reveal-up ${
+                i === 0 ? "delay-100" : i === 1 ? "delay-200" : i === 2 ? "delay-300" : "delay-400"
+              }`} 
+              id={`q-${i}`}
+            >
               <div className="flex items-start mb-6 flex-row-reverse">
-                <span className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-700 flex items-center justify-center font-black text-sm shrink-0 ml-4">
+                <span className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-700 flex items-center justify-center font-black text-sm shrink-0 ml-4 border border-indigo-100">
                   {i + 1}
                 </span>
                 <h3 className="text-xl font-bold text-slate-900 leading-snug pt-0.5">{q.questionText}</h3>
               </div>
 
               {q.imageUrl && (
-                <div className="mb-6 mr-12">
-                  <img src={q.imageUrl} alt="سؤال" className="max-h-64 rounded-xl border border-slate-200" />
+                <div className="mb-6 mr-12 opacity-0 animate-reveal-up delay-500">
+                  <img src={q.imageUrl} alt="سؤال" className="max-h-64 rounded-xl border border-slate-200 hover:scale-[1.02] transition-transform" />
                 </div>
               )}
 
@@ -203,8 +209,8 @@ export default function StudentQuizTest({ loaderData }: Route.ComponentProps) {
                   return (
                     <label
                       key={optIndex}
-                      className={`flex items-center p-4 rounded-xl border cursor-pointer transition-colors flex-row-reverse group select-none ${
-                        isChecked ? 'border-indigo-500 bg-indigo-50 shadow-sm' : 'border-slate-200 bg-white hover:border-indigo-300'
+                      className={`flex items-center p-4 rounded-xl border cursor-pointer transition-all flex-row-reverse group select-none active:scale-[0.98] ${
+                        isChecked ? 'border-indigo-500 bg-indigo-50 shadow-md ring-1 ring-indigo-500' : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50'
                       }`}
                     >
                       <input
@@ -213,9 +219,9 @@ export default function StudentQuizTest({ loaderData }: Route.ComponentProps) {
                         value={val}
                         checked={isChecked}
                         onChange={() => handleAnswerChange(q.id, val)}
-                        className="w-5 h-5 text-indigo-600 border-slate-300 focus:ring-indigo-500 ml-4"
+                        className="w-5 h-5 text-indigo-600 border-slate-300 focus:ring-indigo-500 ml-4 transition-transform group-hover:scale-110"
                       />
-                      <span className={`text-base font-medium flex-1 ${isChecked ? 'text-indigo-900' : 'text-slate-700 group-hover:text-slate-900'}`}>{opt.text}</span>
+                      <span className={`text-base font-medium flex-1 ${isChecked ? 'text-indigo-900 font-bold' : 'text-slate-700 group-hover:text-slate-900'}`}>{opt.text}</span>
                     </label>
                   );
                 })}
@@ -226,15 +232,15 @@ export default function StudentQuizTest({ loaderData }: Route.ComponentProps) {
       </div>
 
       {/* Bottom Actions */}
-      <div className="fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] p-4 z-40">
+      <div className="fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 shadow-[0_-4px_12px_-1px_rgba(0,0,0,0.08)] p-4 z-40 opacity-0 animate-reveal-up delay-500">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="text-sm font-medium text-slate-500">
-            تم الإجابة على <span className="text-slate-900 font-bold mx-1">{Object.keys(answers).length}</span> من <span className="text-slate-900 font-bold mx-1">{quiz.questions.length}</span>
+            تم الإجابة على <span className="text-indigo-600 font-black mx-1">{Object.keys(answers).length}</span> من <span className="text-slate-900 font-black mx-1">{quiz.questions.length}</span>
           </div>
           <button
             onClick={() => handleSubmit(false)}
             disabled={isSubmitting}
-            className="inline-flex items-center justify-center px-8 py-3.5 border border-transparent text-lg font-black rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-200 transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 cursor-pointer"
+            className="inline-flex items-center justify-center px-8 py-3.5 border border-transparent text-lg font-black rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 animate-glow cursor-pointer"
           >
             {isSubmitting ? "جاري التسليم..." : "تسليم الاختبار"}
           </button>

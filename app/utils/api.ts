@@ -1,8 +1,11 @@
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:7492/api";
+import { redirect } from "react-router";
+
+// const nodeEnv = process.env.VITE_NODE_ENV || "production";
+export const API_BASE = "http://localhost:7492/api";
 
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     const url = `${API_BASE}${endpoint}`;
-    
+
     const defaultOptions: RequestInit = {
         headers: {
             "Content-Type": "application/json",
@@ -20,13 +23,27 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     });
 
     if (!response.ok) {
+        if (response.status === 401 && !endpoint.includes("/auth/login")) {
+            throw redirect("/login");
+        }
+
         let errorData;
         try {
             errorData = await response.json();
         } catch (e) {
             errorData = { message: "An unexpected error occurred." };
         }
-        throw new Error(errorData.error || errorData.message || "Request failed");
+        
+        class ApiError extends Error {
+            status: number;
+            constructor(message: string, status: number) {
+                super(message);
+                this.name = "ApiError";
+                this.status = status;
+            }
+        }
+        
+        throw new ApiError(errorData.error || errorData.message || "Request failed", response.status);
     }
 
     return response.json();

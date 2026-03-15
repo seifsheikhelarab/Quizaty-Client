@@ -36,7 +36,23 @@ export default function RegisterPage() {
         method: "POST",
         body: JSON.stringify(body),
       });
-      navigate(data.user.role === "teacher" ? "/teacher/dashboard" : "/student/dashboard");
+
+      if (data.user.role === "student") {
+        const inviteClassId = sessionStorage.getItem("inviteClassId");
+        if (inviteClassId) {
+          try {
+            await apiFetch(`/classes/${inviteClassId}/join`, { method: "POST" });
+            sessionStorage.removeItem("inviteClassId");
+            navigate("/student/classes");
+            return;
+          } catch (joinErr) {
+            console.error("Failed to join class after registration", joinErr);
+          }
+        }
+        navigate("/student/dashboard");
+      } else {
+        navigate("/teacher/dashboard");
+      }
     } catch (err: any) {
       setError(err.message || "فشل التسجيل. حاول مرة أخرى.");
     } finally {
@@ -49,13 +65,17 @@ export default function RegisterPage() {
   const inputCls = "w-full px-4 py-3.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all outline-none font-medium placeholder:text-slate-400 text-right";
 
   return (
-    <div className="bg-slate-50 min-h-screen flex items-center justify-center p-6 text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
-      <div className="max-w-md mx-auto w-full bg-white rounded-4xl shadow-xl border border-slate-100 p-10 relative overflow-hidden">
+    <div className="bg-slate-50 min-h-screen flex items-center justify-center p-6 text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 overflow-hidden relative">
+      {/* Background Decorative Element */}
+      <div className="absolute top-0 -left-64 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 -right-64 w-[500px] h-[500px] bg-violet-500/5 rounded-full blur-3xl" />
+
+      <div className="max-w-md mx-auto w-full bg-white rounded-4xl shadow-2xl border border-slate-100 p-10 relative overflow-hidden opacity-0 animate-reveal-up">
         <div className="absolute top-0 right-0 w-full h-1.5 bg-indigo-500" />
 
         <div className="text-center mb-10">
-          <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-6 transform -rotate-3">
-            <svg className="w-8 h-8 text-indigo-600 rotate-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-float">
+            <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
             </svg>
           </div>

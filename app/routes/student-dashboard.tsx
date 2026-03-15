@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, redirect } from "react-router";
 import { apiFetch } from "../utils/api";
 import type { Route } from "./+types/student-dashboard";
 
@@ -7,7 +7,14 @@ export function meta() {
 }
 
 export async function clientLoader() {
-  return await apiFetch("/student/dashboard");
+  try {
+    return await apiFetch("/student/dashboard");
+  } catch (err: any) {
+    if (err.status === 401 || err.status === 403) {
+      throw redirect("/login");
+    }
+    throw err;
+  }
 }
 
 export default function StudentDashboard({ loaderData }: Route.ComponentProps) {
@@ -15,7 +22,7 @@ export default function StudentDashboard({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="text-right">
-      <div className="mb-12">
+      <div className="mb-12 opacity-0 animate-reveal-up">
         <h2 className="text-3xl font-black text-slate-900 tracking-tight">
           مرحباً بك، {student.name || "طالب"}! 👋
         </h2>
@@ -23,7 +30,7 @@ export default function StudentDashboard({ loaderData }: Route.ComponentProps) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <Link to="/student/quizzes" className="block bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all duration-200 group">
+        <Link to="/student/quizzes" className="block bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all duration-200 group opacity-0 animate-reveal-up delay-100">
           <div className="flex items-center justify-between mb-4 flex-row-reverse">
             <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,7 +47,7 @@ export default function StudentDashboard({ loaderData }: Route.ComponentProps) {
           </div>
         </Link>
 
-        <Link to="/student/classes" className="block bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all duration-200 group">
+        <Link to="/student/classes" className="block bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all duration-200 group opacity-0 animate-reveal-up delay-200">
           <div className="flex items-center justify-between mb-4 flex-row-reverse">
             <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

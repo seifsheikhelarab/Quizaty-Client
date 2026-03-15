@@ -28,18 +28,30 @@ export default function LoginPage() {
         body.password = formData.get("password") as string;
 
         try {
-            const data = await apiFetch("/auth/login", {
-                method: "POST",
-                body: JSON.stringify(body),
-            });
-            navigate(
-                data.user.role === "teacher"
-                    ? "/teacher/dashboard"
-                    : "/student/dashboard",
-            );
-        } catch (err: any) {
-            setError(err.message || "فشل تسجيل الدخول. حاول مرة أخرى.");
-        } finally {
+      const data = await apiFetch("/auth/login", {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+
+      if (data.user.role === "student") {
+        const inviteClassId = sessionStorage.getItem("inviteClassId");
+        if (inviteClassId) {
+          try {
+            await apiFetch(`/classes/${inviteClassId}/join`, { method: "POST" });
+            sessionStorage.removeItem("inviteClassId");
+            navigate("/student/classes");
+            return;
+          } catch (joinErr) {
+            console.error("Failed to join class after login", joinErr);
+          }
+        }
+        navigate("/student/dashboard");
+      } else {
+        navigate("/teacher/dashboard");
+      }
+    } catch (err: any) {
+      setError(err.message || "فشل تسجيل الدخول. حاول مرة أخرى.");
+    } finally {
             setLoading(false);
         }
     };
@@ -50,15 +62,19 @@ export default function LoginPage() {
         "w-1/2 py-2.5 text-sm font-bold rounded-xl text-slate-500 hover:text-slate-900 transition-all duration-200";
 
     return (
-        <div className="bg-slate-50 min-h-screen flex items-center justify-center p-6 text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
-            <div className="max-w-md mx-auto w-full bg-white rounded-4xl shadow-xl border border-slate-100 p-10 relative overflow-hidden">
+        <div className="bg-slate-50 min-h-screen flex items-center justify-center p-6 text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 overflow-hidden relative">
+            {/* Background Decorative Element */}
+            <div className="absolute top-0 -left-64 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 -right-64 w-[500px] h-[500px] bg-violet-500/5 rounded-full blur-3xl" />
+
+            <div className="max-w-md mx-auto w-full bg-white rounded-4xl shadow-2xl border border-slate-100 p-10 relative overflow-hidden opacity-0 animate-reveal-up">
                 {/* Accent Line */}
                 <div className="absolute top-0 right-0 w-full h-1.5 bg-indigo-500" />
 
                 <div className="text-center mb-10">
-                    <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-6 transform rotate-3">
+                    <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-float">
                         <svg
-                            className="w-8 h-8 text-indigo-600 -rotate-3"
+                            className="w-8 h-8 text-indigo-600"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"

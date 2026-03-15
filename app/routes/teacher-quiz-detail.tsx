@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { apiFetch } from "../utils/api";
+import { apiFetch, API_BASE } from "../utils/api";
 import type { Route } from "./+types/teacher-quiz-detail";
 
 export function meta() {
@@ -85,7 +85,13 @@ export default function TeacherQuizDetail({ loaderData }: Route.ComponentProps) 
         </div>
         <div className="mt-4 md:mt-0 flex items-center space-x-3 space-x-reverse flex-wrap gap-y-2">
           {limits.reports !== 'basic' && (
-            <a href={`/api/teacher/quizzes/${quiz.id}/export`} target="_blank" rel="noopener noreferrer" className="px-4 py-2 border text-sm font-bold rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border-emerald-200 transition-colors inline-flex items-center gap-2">
+            <a 
+              href={`${API_BASE}/teacher/quizzes/${quiz.id}/export`} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              download
+              className="px-4 py-2 border text-sm font-bold rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border-emerald-200 transition-colors inline-flex items-center gap-2"
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
               تصدير Excel
             </a>

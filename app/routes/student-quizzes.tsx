@@ -34,12 +34,11 @@ export default function StudentQuizzes({ loaderData }: Route.ComponentProps) {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {quizzes.map((quiz) => {
+          {quizzes.map((quiz, i) => {
             const now = new Date();
             const startDate = new Date(quiz.startTime);
             const endDate = new Date(quiz.endTime);
             const isOpen = now >= startDate && now <= endDate;
-            const isEnded = now > endDate;
             const isUpcoming = now < startDate;
             const statusText = isUpcoming ? "قادم" : isOpen ? "مفتوح" : "انتهى";
             const statusColor = isUpcoming ? "bg-amber-100 text-amber-800" : isOpen ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-800";
@@ -48,7 +47,12 @@ export default function StudentQuizzes({ loaderData }: Route.ComponentProps) {
             const scoreReleased = quiz.showResults;
 
             return (
-              <div key={quiz.id} className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col hover:shadow-md hover:border-indigo-300 transition-all text-right">
+              <div 
+                key={quiz.id} 
+                className={`bg-white rounded-2xl border border-slate-200 p-6 flex flex-col hover:shadow-md hover:border-indigo-300 transition-all text-right opacity-0 animate-reveal-up ${
+                  i === 0 ? "delay-100" : i === 1 ? "delay-200" : i === 2 ? "delay-300" : "delay-300"
+                }`}
+              >
                 <div className="mb-3">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${statusColor}`}>{statusText}</span>
                 </div>

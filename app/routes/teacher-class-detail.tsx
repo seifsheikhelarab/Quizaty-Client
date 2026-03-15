@@ -39,6 +39,15 @@ export default function TeacherClassDetail({ loaderData }: Route.ComponentProps)
   const [studentName, setStudentName] = useState("");
   const [studentPhone, setStudentPhone] = useState("");
   const [adding, setAdding] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyInvite = () => {
+    const inviteLink = `${window.location.origin}/invite/${classData.id}`;
+    navigator.clipboard.writeText(inviteLink).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   const handleAddStudent = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -79,7 +88,13 @@ export default function TeacherClassDetail({ loaderData }: Route.ComponentProps)
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">{classData.name}</h2>
           {classData.description && <p className="text-slate-500 mt-2 text-sm">{classData.description}</p>}
         </div>
-        <div className="mt-4 md:mt-0 flex items-center space-x-3 space-x-reverse">
+        <div className="mt-4 md:mt-0 flex flex-wrap items-center gap-3">
+          <button
+            onClick={handleCopyInvite}
+            className="inline-flex items-center justify-center px-4 py-2 border border-indigo-200 text-sm font-bold rounded-lg text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors cursor-pointer"
+          >
+            {copied ? "تم النسخ!" : "نسخ رابط الدعوة"}
+          </button>
           <Link
             to={`/teacher/classes/${classData.id}/edit`}
             className="inline-flex items-center justify-center px-4 py-2 border border-slate-300 text-sm font-bold rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors"

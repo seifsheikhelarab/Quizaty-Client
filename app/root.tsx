@@ -30,7 +30,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     const isLoading = navigation.state !== "idle";
 
     return (
-        <html lang="ar" dir="rtl">
+        <html lang="ar" dir="rtl" suppressHydrationWarning>
             <head>
                 <meta charSet="utf-8" />
                 <meta
@@ -40,7 +40,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Meta />
                 <Links />
             </head>
-            <body>
+            <body suppressHydrationWarning>
                 {isLoading && (
                     <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-indigo-100 overflow-hidden">
                         <div className="h-full bg-indigo-600 animate-loading-bar shadow-[0_0_10px_rgb(79,70,229)]"></div>

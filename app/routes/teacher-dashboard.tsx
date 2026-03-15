@@ -78,14 +78,14 @@ export default function TeacherDashboard({ loaderData }: Route.ComponentProps) {
   return (
     <div>
       {/* Page Header */}
-      <div className="mb-8">
+      <div className="mb-8 opacity-0 animate-reveal-up">
         <h2 className="text-2xl font-black text-slate-900">لوحة التحكم</h2>
         <p className="text-slate-500 font-medium mt-1">مرحباً بك! إليك ملخص نشاطك.</p>
       </div>
 
       <Suspense fallback={<div className="flex justify-center py-12"><Spinner size="lg" /></div>}>
         {/* Subscription & Usage */}
-        <div className="mb-6 bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+        <div className="mb-6 bg-white border border-slate-200 rounded-2xl p-6 space-y-4 opacity-0 animate-reveal-up delay-100 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
@@ -114,57 +114,66 @@ export default function TeacherDashboard({ loaderData }: Route.ComponentProps) {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-          <StatCard
-            label="الاختبارات"
-            value={stats.quizzes}
-            color="bg-indigo-50"
-            icon={
-              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-            }
-          />
-          <StatCard
-            label="الطلاب"
-            value={stats.students}
-            color="bg-emerald-50"
-            icon={
-              <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            }
-          />
-          <StatCard
-            label="التقديمات"
-            value={stats.submissions}
-            color="bg-amber-50"
-            icon={
-              <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            }
-          />
-          <StatCard
-            label="الفصول"
-            value={stats.classes}
-            color="bg-rose-50"
-            icon={
-              <svg className="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-            }
-          />
+          <div className="opacity-0 animate-reveal-up delay-200">
+            <StatCard
+              label="الاختبارات"
+              value={stats.quizzes}
+              color="bg-indigo-50"
+              icon={
+                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              }
+            />
+          </div>
+          <div className="opacity-0 animate-reveal-up delay-200">
+            <StatCard
+              label="الطلاب"
+              value={stats.students}
+              color="bg-emerald-50"
+              icon={
+                <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              }
+            />
+          </div>
+          <div className="opacity-0 animate-reveal-up delay-300">
+            <StatCard
+              label="التقديمات"
+              value={stats.submissions}
+              color="bg-amber-50"
+              icon={
+                <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              }
+            />
+          </div>
+          <div className="opacity-0 animate-reveal-up delay-400">
+            <StatCard
+              label="الفصول"
+              value={stats.classes}
+              color="bg-rose-50"
+              icon={
+                <svg className="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              }
+            />
+          </div>
         </div>
       </Suspense>
 
       {/* Quick Actions */}
+      <h2 className="text-lg font-black text-slate-900 mb-6 opacity-0 animate-reveal-up delay-400">الإجراءات السريعة</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Link
           to="/teacher/quizzes/create"
-          className="bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg transition-shadow group"
+          className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:border-indigo-300-lg transition-all group opacity-0 animate-reveal-up delay-500"
         >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
+            <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center group-hover:bg-indigo-200 transition-colors animate-float">
               <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
@@ -177,7 +186,7 @@ export default function TeacherDashboard({ loaderData }: Route.ComponentProps) {
         </Link>
         <Link
           to="/teacher/classes/create"
-          className="bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg transition-shadow group"
+          className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:border-emerald-300 transition-all group opacity-0 animate-reveal-up delay-500"
         >
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
@@ -194,7 +203,7 @@ export default function TeacherDashboard({ loaderData }: Route.ComponentProps) {
         {limits?.assistants > 0 && !user?.isAssistant && (
           <Link
             to="/teacher/assistants"
-            className="bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg transition-shadow group sm:col-span-2 md:col-span-1"
+            className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:border-rose-300 transition-all group sm:col-span-2 md:col-span-1 opacity-0 animate-reveal-up delay-500"
           >
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center group-hover:bg-rose-200 transition-colors">

@@ -8,6 +8,9 @@ export default [
   route("login", "routes/login.tsx"),
   route("register", "routes/register.tsx"),
 
+  // Invite link flow
+  route("invite/:id", "routes/invite.tsx"),
+
   // Teacher routes (with authenticated layout)
   layout("routes/teacher-layout.tsx", [
     route("teacher/dashboard", "routes/teacher-dashboard.tsx"),
