@@ -1,7 +1,6 @@
 import { redirect } from "react-router";
 
-// const nodeEnv = process.env.VITE_NODE_ENV || "production";
-export const API_BASE = "http://localhost:7492/api";
+export const API_BASE = process.env.VITE_API_URL;
 
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     const url = `${API_BASE}${endpoint}`;
