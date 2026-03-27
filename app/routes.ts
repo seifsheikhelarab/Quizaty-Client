@@ -25,6 +25,8 @@ export default [
     route("teacher/students/:id", "routes/teacher-student-detail.tsx"),
     route("teacher/quizzes/:quizId/submissions/:submissionId", "routes/teacher-submission-detail.tsx"),
     route("teacher/assistants", "routes/teacher-assistants.tsx"),
+    route("teacher/question-bank", "routes/teacher-question-bank.tsx"),
+    route("teacher/question-bank/ocr", "routes/teacher-ocr-upload.tsx"),
   ]),
 
   // Student routes (with authenticated layout)

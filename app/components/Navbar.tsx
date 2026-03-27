@@ -27,6 +27,7 @@ export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
     ? [
         { name: "لوحة التحكم", path: "/teacher/dashboard" },
         { name: "الاختبارات", path: "/teacher/quizzes" },
+        { name: "بنك الأسئلة", path: "/teacher/question-bank" },
         { name: "الفصول", path: "/teacher/classes" },
       ]
     : [

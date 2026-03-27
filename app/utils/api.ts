@@ -1,6 +1,6 @@
 import { redirect } from "react-router";
 
-export const API_BASE = "https://test-app-tau-cyan.vercel.app/api";
+export const API_BASE = import.meta.env.VITE_API_URL ||"http://localhost:7492/api";
 
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     const url = `${API_BASE}${endpoint}`;
