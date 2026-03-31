@@ -25,12 +25,12 @@ export default function StudentQuizzes({ loaderData }: Route.ComponentProps) {
       </div>
 
       {quizzes.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-          <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="rounded-[2rem] border border-slate-200 bg-white p-12 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-50 text-primary-600">
             <span className="text-3xl">📝</span>
           </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد اختبارات</h3>
-          <p className="text-slate-500">لم يتم تعيين أي اختبارات لفصولك الدراسية بعد.</p>
+          <h3 className="mb-2 text-lg font-bold text-slate-900">لا توجد اختبارات</h3>
+          <p className="mx-auto max-w-md text-slate-500">لم يتم تعيين أي اختبارات لفصولك الدراسية بعد. ستظهر هنا فور مشاركة المعلم للاختبارات الجديدة.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -41,39 +41,47 @@ export default function StudentQuizzes({ loaderData }: Route.ComponentProps) {
             const isOpen = now >= startDate && now <= endDate;
             const isUpcoming = now < startDate;
             const statusText = isUpcoming ? "قادم" : isOpen ? "مفتوح" : "انتهى";
-            const statusColor = isUpcoming ? "bg-amber-100 text-amber-800" : isOpen ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-800";
+            const statusColor = isUpcoming ? "bg-warning-50 text-warning-700 border border-warning-200" : isOpen ? "bg-secondary-50 text-secondary-700 border border-secondary-200" : "bg-slate-100 text-slate-700 border border-slate-200";
             const sub = submissionMap[quiz.id];
             const hasSubmitted = sub && sub.submittedAt;
             const scoreReleased = quiz.showResults;
+            const primaryActionClass = "inline-flex min-h-11 items-center justify-center rounded-xl px-4 py-2.5 text-xs font-bold transition-all";
 
             return (
               <div 
                 key={quiz.id} 
-                className={`bg-white rounded-2xl border border-slate-200 p-6 flex flex-col hover:shadow-md hover:border-primary-300 transition-all text-right opacity-0 animate-reveal-up ${
+                className={`flex flex-col rounded-[2rem] border border-slate-200 bg-white p-6 text-right shadow-sm hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-lg transition-all opacity-0 animate-reveal-up ${
                   i === 0 ? "delay-100" : i === 1 ? "delay-200" : i === 2 ? "delay-300" : "delay-300"
                 }`}
               >
-                <div className="mb-3">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${statusColor}`}>{statusText}</span>
+                <div className="mb-4 flex items-center justify-between gap-3 flex-row-reverse">
+                  <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold ${statusColor}`}>{statusText}</span>
+                  <span className="truncate text-xs font-bold text-slate-400">{quiz.teacher?.name || "المعلم"}</span>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-1">{quiz.title}</h3>
-                {quiz.description && <p className="text-sm text-slate-500 mb-3 line-clamp-2">{quiz.description}</p>}
-                <div className="text-sm text-slate-500 mb-2">
-                  {startDate.toLocaleDateString("ar-EG")} - {endDate.toLocaleDateString("ar-EG")}
+                <h3 className="mb-2 min-h-[3.5rem] text-xl font-bold leading-snug text-slate-900">{quiz.title}</h3>
+                {quiz.description ? (
+                  <p className="mb-4 min-h-[2.75rem] text-sm leading-6 text-slate-500 line-clamp-2">{quiz.description}</p>
+                ) : (
+                  <p className="mb-4 min-h-[2.75rem] text-sm leading-6 text-slate-400">لا توجد ملاحظات إضافية لهذا الاختبار.</p>
+                )}
+                <div className="mb-4 rounded-2xl bg-slate-50/80 px-4 py-3 text-sm text-slate-600">
+                  <div className="flex items-center justify-between gap-3 flex-row-reverse">
+                    <span className="font-bold text-slate-700">المدة الزمنية</span>
+                    <span>{startDate.toLocaleDateString("ar-EG")} - {endDate.toLocaleDateString("ar-EG")}</span>
+                  </div>
                 </div>
-                <p className="text-xs font-bold text-primary-600 mb-4">{quiz.teacher?.name || "معلم"}</p>
 
-                <div className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-slate-100 flex-row-reverse">
-                  <Link to={`/student/quizzes/${quiz.id}`} className="inline-flex items-center justify-center px-3 py-2 border border-slate-300 text-xs font-bold rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors">
+                <div className="mt-auto grid grid-cols-1 gap-2 border-t border-slate-100 pt-4 sm:grid-cols-2">
+                  <Link to={`/student/quizzes/${quiz.id}`} className={`${primaryActionClass} border border-slate-300 bg-white text-slate-700 hover:bg-slate-50`}>
                     عرض التفاصيل
                   </Link>
                   {scoreReleased && hasSubmitted && (
-                    <Link to={`/student/quizzes/${quiz.id}/result`} className="inline-flex items-center justify-center px-3 py-2 border border-transparent text-xs font-bold rounded-lg text-white bg-primary-600 hover:bg-primary-700 transition-colors">
+                    <Link to={`/student/quizzes/${quiz.id}/result`} className={`${primaryActionClass} border border-transparent bg-primary-600 text-white hover:bg-primary-700`}>
                       عرض النتيجة
                     </Link>
                   )}
                   {isOpen && !hasSubmitted && (
-                    <Link to={`/student/quizzes/${quiz.id}/test`} className="inline-flex items-center justify-center px-3 py-2 border border-transparent text-xs font-bold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 transition-colors">
+                    <Link to={`/student/quizzes/${quiz.id}/test`} className={`${primaryActionClass} border border-transparent bg-secondary-600 text-white hover:bg-secondary-700 sm:col-span-2`}>
                       بدء الاختبار
                     </Link>
                   )}

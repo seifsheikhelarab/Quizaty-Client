@@ -83,18 +83,16 @@ export default function RegisterPage() {
     }
   };
 
-  const activeBtn = "w-1/2 py-2.5 text-sm font-black rounded-xl bg-white shadow-sm text-primary-600 transition-all duration-200";
+  const activeBtn = "w-1/2 py-2.5 text-sm font-black rounded-xl bg-white shadow-sm text-primary-700 transition-all duration-200";
   const inactiveBtn = "w-1/2 py-2.5 text-sm font-bold rounded-xl text-slate-500 hover:text-slate-900 transition-all duration-200";
   const inputCls = "w-full px-4 py-3.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-4 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all outline-none font-medium placeholder:text-slate-400 text-right";
 
   return (
-    <div className="bg-slate-50 min-h-screen flex items-center justify-center p-6 text-slate-900 selection:bg-primary-100 selection:text-primary-900 overflow-hidden relative">
-      {/* Background Decorative Element */}
-      <div className="absolute top-0 -left-64 w-[500px] h-[500px] bg-primary-500/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 -right-64 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-3xl" />
+    <div className="min-h-screen overflow-hidden relative flex items-center justify-center p-6 text-slate-900">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,color-mix(in_oklab,var(--color-primary-100)_80%,transparent),transparent_30%),radial-gradient(circle_at_bottom_right,color-mix(in_oklab,var(--color-secondary-100)_85%,transparent),transparent_35%)]" />
 
-      <div className="max-w-md mx-auto w-full bg-white rounded-4xl shadow-2xl border border-slate-100 p-10 relative overflow-hidden opacity-0 animate-reveal-up">
-        <div className="absolute top-0 right-0 w-full h-1.5 bg-primary-500" />
+      <div className="max-w-md mx-auto w-full rounded-4xl border border-white/75 bg-white/92 p-10 relative overflow-hidden shadow-[0_30px_80px_-40px_color-mix(in_srgb,var(--color-primary-700)_40%,transparent)] backdrop-blur opacity-0 animate-reveal-up">
+        <div className="absolute top-0 right-0 h-1.5 w-full bg-linear-to-l from-secondary-500 via-primary-500 to-primary-600" />
 
         <div className="text-center mb-10">
           <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-float">
@@ -107,7 +105,7 @@ export default function RegisterPage() {
         </div>
 
         {error && (
-          <div className="bg-rose-50 border border-rose-200 text-rose-600 px-5 py-4 rounded-xl mb-8 flex items-start text-right">
+          <div className="bg-danger-50 border border-danger-200 text-danger-700 px-5 py-4 rounded-xl mb-8 flex items-start text-right">
             <svg className="w-5 h-5 ml-3 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -116,7 +114,7 @@ export default function RegisterPage() {
         )}
 
         {/* Role Selector */}
-        <div className="flex justify-center mb-8 bg-slate-100 p-1 rounded-2xl">
+        <div className="mb-8 flex justify-center rounded-2xl border border-primary-100/70 bg-primary-50/60 p-1">
           <button type="button" className={`${role === "student" ? activeBtn : inactiveBtn} cursor-pointer`} onClick={() => setRole("student")}>طالب</button>
           <button type="button" className={`${role === "teacher" ? activeBtn : inactiveBtn} cursor-pointer`} onClick={() => setRole("teacher")}>معلم</button>
         </div>

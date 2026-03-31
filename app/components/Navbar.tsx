@@ -15,7 +15,7 @@ export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
 
   const isActive = (path: string) =>
     location.pathname.startsWith(path)
-      ? "text-primary-600 bg-primary-50 md:bg-transparent md:text-primary-700"
+      ? "text-primary-700 bg-primary-50/80 md:bg-transparent md:text-primary-700"
       : "text-slate-500 hover:text-slate-900 hover:bg-slate-50 md:hover:bg-transparent";
 
   const handleLogout = async () => {
@@ -37,11 +37,11 @@ export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
       ];
 
   return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-40 opacity-0 animate-reveal-down">
+    <header className="sticky top-0 z-40 border-b border-white/70 bg-white/88 shadow-[0_10px_35px_-28px_color-mix(in_srgb,var(--color-primary-700)_35%,transparent)] backdrop-blur-xl opacity-0 animate-reveal-down">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link to={role === "teacher" ? "/teacher/dashboard" : "/student/dashboard"} className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center transform -rotate-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-primary-600 to-secondary-500 shadow-sm shadow-primary-200 transform -rotate-3">
               <svg className="w-5 h-5 text-white rotate-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
@@ -88,7 +88,7 @@ export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
 
               <button
                 onClick={handleLogout}
-                className="hidden md:flex text-sm font-bold text-slate-500 hover:text-rose-600 transition-colors items-center gap-1.5 group cursor-pointer"
+              className="hidden md:flex text-sm font-bold text-slate-500 hover:text-danger-600 transition-colors items-center gap-1.5 group cursor-pointer"
               >
                 <span>الخروج</span>
                 <svg className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,10 +118,10 @@ export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
       {isMobileMenuOpen && !backUrl && (
         <>
           <div 
-            className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-30 md:hidden animate-in fade-in duration-300"
+            className="fixed inset-0 bg-slate-900/12 backdrop-blur-sm z-30 md:hidden animate-in fade-in duration-300"
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          <div className="absolute top-16 left-0 right-0 bg-white border-b border-slate-200 z-40 md:hidden overflow-hidden shadow-2xl rounded-b-4xl animate-reveal-down">
+          <div className="absolute top-16 left-0 right-0 z-40 overflow-hidden rounded-b-4xl border-b border-primary-100/70 bg-white/96 shadow-2xl shadow-slate-900/8 md:hidden animate-reveal-down">
             <nav className="flex flex-col p-6 space-y-1">
               {navLinks.map((link, i) => (
                 <Link 
@@ -143,19 +143,19 @@ export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
               
               <button
                 onClick={handleLogout}
-                className="w-full text-right py-4 px-5 rounded-2xl text-base font-black text-rose-600 hover:bg-rose-50 transition-all flex items-center justify-between opacity-0 animate-reveal-right delay-300"
+                className="w-full text-right py-4 px-5 rounded-2xl text-base font-black text-danger-600 hover:bg-danger-50 transition-all flex items-center justify-between opacity-0 animate-reveal-right delay-300"
               >
                 <span>تسجيل الخروج</span>
-                <div className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center">
-                  <svg className="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-10 h-10 bg-danger-50 rounded-xl flex items-center justify-center">
+                  <svg className="w-5 h-5 text-danger-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
                 </div>
               </button>
             </nav>
-            <div className="bg-slate-50 p-6 flex items-center justify-between opacity-0 animate-reveal-up delay-400">
+            <div className="bg-linear-to-l from-primary-50/70 to-secondary-50/60 p-6 flex items-center justify-between opacity-0 animate-reveal-up delay-400">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white font-black text-lg shadow-lg shadow-primary-200">
+                <div className="w-10 h-10 bg-linear-to-br from-primary-600 to-secondary-500 rounded-xl flex items-center justify-center text-white font-black text-lg shadow-lg shadow-primary-200">
                   {userName ? userName.charAt(0).toUpperCase() : "م"}
                 </div>
                 <div>

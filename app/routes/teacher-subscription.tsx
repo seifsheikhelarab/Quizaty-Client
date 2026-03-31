@@ -58,7 +58,7 @@ export default function TeacherSubscription({ loaderData }: Route.ComponentProps
 
       {/* Current Plan */}
       {subscription && (
-        <div className="bg-gradient-to-r from-primary-600 to-cyan-600 rounded-2xl p-6 mb-8 text-white">
+        <div className="rounded-[2rem] border border-primary-200/70 bg-linear-to-l from-secondary-600 via-primary-600 to-primary-700 p-6 mb-8 text-white shadow-xl shadow-primary-200/70">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <p className="text-primary-200 text-sm font-medium">خطتك الحالية</p>
@@ -106,7 +106,7 @@ export default function TeacherSubscription({ loaderData }: Route.ComponentProps
             <ul className="mt-6 space-y-3">
               {tier.features.map((feature, i) => (
                 <li key={i} className="flex items-center text-sm text-slate-600 flex-row-reverse">
-                  <svg className="w-5 h-5 text-emerald-500 ml-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-success-500 ml-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   {feature}
@@ -146,7 +146,7 @@ export default function TeacherSubscription({ loaderData }: Route.ComponentProps
             <p className="text-xs text-slate-400 mt-1">الحد: {usage?.students?.max === null ? "غير محدود" : usage?.students?.max || 50}</p>
           </div>
           <div className="text-center p-4 bg-slate-50 rounded-xl">
-            <p className="text-3xl font-black text-emerald-600">{usage?.quizzes?.current || 0}</p>
+            <p className="text-3xl font-black text-secondary-600">{usage?.quizzes?.current || 0}</p>
             <p className="text-sm text-slate-500 mt-1">الاختبارات</p>
             <p className="text-xs text-slate-400 mt-1">الحد: {usage?.quizzes?.max === null ? "غير محدود" : usage?.quizzes?.max || 2}</p>
           </div>

@@ -42,8 +42,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </head>
             <body suppressHydrationWarning>
                 {isLoading && (
-                    <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-primary-100 overflow-hidden">
-                        <div className="h-full bg-primary-600 animate-loading-bar shadow-[0_0_10px_rgb(14,165,233)]"></div>
+                    <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-primary-100/80 overflow-hidden backdrop-blur-sm">
+                        <div className="h-full bg-linear-to-l from-secondary-500 via-primary-500 to-primary-600 animate-loading-bar shadow-[0_0_14px_color-mix(in_srgb,var(--color-primary-500)_40%,transparent)]"></div>
                     </div>
                 )}
                 {children}

@@ -36,8 +36,8 @@ export default function TeacherQuizzes({ loaderData }: Route.ComponentProps) {
     const now = new Date();
     const start = new Date(quiz.startTime);
     const end = new Date(quiz.endTime);
-    if (now < start) return { label: "قادم", color: "bg-amber-50 text-amber-700 border-amber-100" };
-    if (now >= start && now <= end) return { label: "نشط", color: "bg-emerald-50 text-emerald-700 border-emerald-100" };
+    if (now < start) return { label: "قادم", color: "bg-warning-50 text-warning-700 border-warning-200" };
+    if (now >= start && now <= end) return { label: "نشط", color: "bg-secondary-50 text-secondary-700 border-secondary-200" };
     return { label: "منتهي", color: "bg-slate-100 text-slate-500 border-slate-200" };
   };
 
@@ -51,7 +51,7 @@ export default function TeacherQuizzes({ loaderData }: Route.ComponentProps) {
     <div className="text-right space-y-10">
       {/* Header & Search Section */}
       <div className="relative overflow-hidden bg-white border border-slate-200 rounded-[3rem] p-8 md:p-12 opacity-0 animate-reveal-up">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary-50/50 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div className="absolute top-0 right-0 h-64 w-64 rounded-full bg-linear-to-br from-primary-100/70 to-secondary-100/60 blur-3xl -mr-20 -mt-20"></div>
         <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-8">
           <div className="space-y-3">
             <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-tight">إدارة الاختبارات</h2>
@@ -151,7 +151,7 @@ export default function TeacherQuizzes({ loaderData }: Route.ComponentProps) {
                     </Link>
                     <button
                       onClick={() => handleDelete(quiz.id)}
-                      className="p-2.5 text-rose-600 bg-rose-50 rounded-xl hover:bg-rose-100 transition-all active:scale-90 cursor-pointer"
+                      className="p-2.5 text-danger-600 bg-danger-50 rounded-xl hover:bg-danger-100 transition-all active:scale-90 cursor-pointer"
                       title="حذف"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

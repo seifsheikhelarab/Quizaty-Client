@@ -27,30 +27,64 @@
   --leading-normal: 1.5;
   --leading-relaxed: 1.625;
 
-  /* Blue/Teal Professional Palette - Refined */
-  --color-primary-50: #f0f9ff;
-  --color-primary-100: #e0f2fe;
-  --color-primary-200: #bae6fd;
-  --color-primary-300: #7dd3fc;
-  --color-primary-400: #38bdf8;
-  --color-primary-500: #0ea5e9;
-  --color-primary-600: #0284c7;
-  --color-primary-700: #0369a1;
-  --color-primary-800: #075985;
-  --color-primary-900: #0c4a6e;
-  
-  /* Slate neutrals with subtle blue tint */
-  --color-slate-50: #f8fafc;
-  --color-slate-100: #f1f5f9;
-  --color-slate-200: #e2e8f0;
-  --color-slate-300: #cbd5e1;
-  --color-slate-400: #94a3b8;
-  --color-slate-500: #64748b;
-  --color-slate-600: #475569;
-  --color-slate-700: #334155;
-  --color-slate-800: #1e293b;
-  --color-slate-900: #0f172a;
-  --color-slate-950: #020617;
+  /* Blue/Teal Professional Palette */
+  --color-primary-50: oklch(0.98 0.013 215);
+  --color-primary-100: oklch(0.95 0.027 216);
+  --color-primary-200: oklch(0.9 0.055 217);
+  --color-primary-300: oklch(0.83 0.093 219);
+  --color-primary-400: oklch(0.75 0.125 222);
+  --color-primary-500: oklch(0.68 0.128 224);
+  --color-primary-600: oklch(0.59 0.118 226);
+  --color-primary-700: oklch(0.5 0.099 228);
+  --color-primary-800: oklch(0.42 0.08 229);
+  --color-primary-900: oklch(0.34 0.061 230);
+
+  /* Teal support for gradients and data accents */
+  --color-secondary-50: oklch(0.98 0.011 191);
+  --color-secondary-100: oklch(0.95 0.027 190);
+  --color-secondary-200: oklch(0.9 0.05 188);
+  --color-secondary-300: oklch(0.84 0.082 186);
+  --color-secondary-400: oklch(0.77 0.106 184);
+  --color-secondary-500: oklch(0.69 0.108 183);
+  --color-secondary-600: oklch(0.59 0.093 183);
+  --color-secondary-700: oklch(0.49 0.075 184);
+  --color-secondary-800: oklch(0.41 0.059 186);
+  --color-secondary-900: oklch(0.33 0.044 188);
+
+  /* Semantic colors */
+  --color-success-50: oklch(0.982 0.018 164);
+  --color-success-100: oklch(0.955 0.042 163);
+  --color-success-200: oklch(0.914 0.074 162);
+  --color-success-500: oklch(0.694 0.123 161);
+  --color-success-600: oklch(0.602 0.109 161);
+  --color-success-700: oklch(0.514 0.091 161);
+
+  --color-warning-50: oklch(0.987 0.018 87);
+  --color-warning-100: oklch(0.96 0.041 86);
+  --color-warning-200: oklch(0.918 0.075 83);
+  --color-warning-500: oklch(0.77 0.14 74);
+  --color-warning-600: oklch(0.69 0.132 67);
+  --color-warning-700: oklch(0.58 0.113 61);
+
+  --color-danger-50: oklch(0.984 0.015 17);
+  --color-danger-100: oklch(0.952 0.038 18);
+  --color-danger-200: oklch(0.901 0.072 20);
+  --color-danger-500: oklch(0.67 0.19 23);
+  --color-danger-600: oklch(0.59 0.175 24);
+  --color-danger-700: oklch(0.51 0.148 25);
+
+  /* Tinted slate neutrals */
+  --color-slate-50: oklch(0.985 0.004 236);
+  --color-slate-100: oklch(0.969 0.007 236);
+  --color-slate-200: oklch(0.928 0.013 236);
+  --color-slate-300: oklch(0.873 0.02 236);
+  --color-slate-400: oklch(0.71 0.028 236);
+  --color-slate-500: oklch(0.554 0.03 236);
+  --color-slate-600: oklch(0.446 0.03 236);
+  --color-slate-700: oklch(0.37 0.029 236);
+  --color-slate-800: oklch(0.278 0.026 236);
+  --color-slate-900: oklch(0.21 0.022 236);
+  --color-slate-950: oklch(0.162 0.019 236);
 }
 
 /* Base Typography */
@@ -67,6 +101,15 @@ body {
   line-height: var(--leading-relaxed);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100%;
+  background-image:
+    radial-gradient(circle at top left, color-mix(in oklab, var(--color-primary-100) 70%, transparent) 0, transparent 28rem),
+    radial-gradient(circle at bottom right, color-mix(in oklab, var(--color-secondary-100) 75%, transparent) 0, transparent 24rem),
+    linear-gradient(180deg, color-mix(in oklab, var(--color-primary-50) 55%, white) 0%, var(--color-slate-50) 38%, color-mix(in oklab, var(--color-secondary-50) 50%, white) 100%);
+}
+
+body {
+  color: var(--color-slate-800);
 }
 
 /* Headings - Consistent hierarchy */
@@ -128,15 +171,20 @@ p, .body-lg {
   color: var(--color-slate-600);
 }
 
-/* Links */
-a {
+/* Only plain, unstyled links should inherit the default link treatment. */
+a:not([class]) {
   color: var(--color-primary-600);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
-a:hover {
+a:not([class]):hover {
   color: var(--color-primary-700);
+}
+
+::selection {
+  background: color-mix(in oklab, var(--color-primary-200) 78%, white);
+  color: var(--color-primary-900);
 }
 
 /* Focus states for accessibility */
@@ -168,8 +216,8 @@ a:hover {
 }
 
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.3); }
-  50% { box-shadow: 0 0 15px 4px rgba(14, 165, 233, 0.15); }
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-primary-500) 28%, transparent); }
+  50% { box-shadow: 0 0 18px 4px color-mix(in srgb, var(--color-primary-400) 18%, transparent); }
 }
 
 .animate-loading-bar { animation: loading-bar 1.5s infinite linear; }
@@ -208,3 +256,20 @@ a:hover {
 .delay-800 { animation-delay: 800ms; }
 .delay-900 { animation-delay: 900ms; }
 .delay-1000 { animation-delay: 1000ms; }
+
+@layer utilities {
+  .text-white {
+    color: var(--color-white);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
