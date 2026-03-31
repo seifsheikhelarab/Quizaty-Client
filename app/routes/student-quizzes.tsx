@@ -12,9 +12,9 @@ export async function clientLoader() {
 }
 
 export default function StudentQuizzes({ loaderData }: Route.ComponentProps) {
-  const { quizzes, submissionMap } = loaderData as {
-    quizzes: { id: string; title: string; description: string | null; startTime: string; endTime: string; showResults: boolean; teacher: { name: string } }[];
-    submissionMap: Record<string, { quizId: string; submittedAt: string | null }>;
+  const { quizzes = [], submissionMap = {} } = loaderData as {
+    quizzes?: { id: string; title: string; description: string | null; startTime: string; endTime: string; showResults: boolean; teacher: { name: string } }[];
+    submissionMap?: Record<string, { quizId: string; submittedAt: string | null }>;
   };
 
   return (
@@ -49,7 +49,7 @@ export default function StudentQuizzes({ loaderData }: Route.ComponentProps) {
             return (
               <div 
                 key={quiz.id} 
-                className={`bg-white rounded-2xl border border-slate-200 p-6 flex flex-col hover:shadow-md hover:border-indigo-300 transition-all text-right opacity-0 animate-reveal-up ${
+                className={`bg-white rounded-2xl border border-slate-200 p-6 flex flex-col hover:shadow-md hover:border-primary-300 transition-all text-right opacity-0 animate-reveal-up ${
                   i === 0 ? "delay-100" : i === 1 ? "delay-200" : i === 2 ? "delay-300" : "delay-300"
                 }`}
               >
@@ -61,14 +61,14 @@ export default function StudentQuizzes({ loaderData }: Route.ComponentProps) {
                 <div className="text-sm text-slate-500 mb-2">
                   {startDate.toLocaleDateString("ar-EG")} - {endDate.toLocaleDateString("ar-EG")}
                 </div>
-                <p className="text-xs font-bold text-indigo-600 mb-4">{quiz.teacher?.name || "معلم"}</p>
+                <p className="text-xs font-bold text-primary-600 mb-4">{quiz.teacher?.name || "معلم"}</p>
 
                 <div className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-slate-100 flex-row-reverse">
                   <Link to={`/student/quizzes/${quiz.id}`} className="inline-flex items-center justify-center px-3 py-2 border border-slate-300 text-xs font-bold rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors">
                     عرض التفاصيل
                   </Link>
                   {scoreReleased && hasSubmitted && (
-                    <Link to={`/student/quizzes/${quiz.id}/result`} className="inline-flex items-center justify-center px-3 py-2 border border-transparent text-xs font-bold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">
+                    <Link to={`/student/quizzes/${quiz.id}/result`} className="inline-flex items-center justify-center px-3 py-2 border border-transparent text-xs font-bold rounded-lg text-white bg-primary-600 hover:bg-primary-700 transition-colors">
                       عرض النتيجة
                     </Link>
                   )}

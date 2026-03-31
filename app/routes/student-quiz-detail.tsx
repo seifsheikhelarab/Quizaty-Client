@@ -12,8 +12,8 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 }
 
 export default function StudentQuizDetail({ loaderData }: Route.ComponentProps) {
-  const { quiz, submission } = loaderData as {
-    quiz: {
+  const data = loaderData as {
+    quiz?: {
       id: string;
       title: string;
       description: string | null;
@@ -23,12 +23,23 @@ export default function StudentQuizDetail({ loaderData }: Route.ComponentProps) 
       totalMarks: number;
       teacher: { name: string };
     };
-    submission: {
+    submission?: {
       id: string;
       score: number | null;
       submittedAt: string | null;
     } | null;
   };
+  
+  const quiz = data?.quiz;
+  const submission = data?.submission;
+
+  if (!quiz) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-slate-500">حدث خطأ في تحميل البيانات</p>
+      </div>
+    );
+  }
 
   const now = new Date();
   const start = new Date(quiz.startTime);
@@ -43,7 +54,7 @@ export default function StudentQuizDetail({ loaderData }: Route.ComponentProps) 
   return (
     <div className="max-w-3xl mx-auto text-right">
       <div className="mb-8">
-        <Link to="/student/quizzes" className="inline-flex items-center text-sm font-bold text-indigo-600 hover:text-indigo-800 mb-4 transition-colors">
+        <Link to="/student/quizzes" className="inline-flex items-center text-sm font-bold text-primary-600 hover:text-primary-800 mb-4 transition-colors">
           <svg className="w-4 h-4 mr-1 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
@@ -104,7 +115,7 @@ export default function StudentQuizDetail({ loaderData }: Route.ComponentProps) 
               <span className="text-3xl mb-2 block">✅</span>
               <h3 className="text-lg font-bold text-emerald-900 mb-1">تم إكمال الاختبار</h3>
               <p className="text-emerald-700 text-sm mb-4">لقد قمت بتسليم إجاباتك لهذا الاختبار.</p>
-              <Link to={`/student/quizzes/${quiz.id}/result`} className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 transition-colors">
+              <Link to={`/student/quizzes/${quiz.id}/result`} className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-primary-600 hover:bg-primary-700 transition-colors">
                 عرض النتيجة
               </Link>
             </div>
@@ -121,15 +132,15 @@ export default function StudentQuizDetail({ loaderData }: Route.ComponentProps) 
               <p className="text-rose-700 text-sm">لم يعد بإمكانك أداء هذا الاختبار.</p>
             </div>
           ) : (
-            <div className="text-center p-6 bg-indigo-50 rounded-xl border border-indigo-100">
-              <h3 className="text-lg font-bold text-indigo-900 mb-2">تعليمات الاختبار</h3>
-              <ul className="text-sm text-indigo-700 text-right list-disc list-inside mb-6 space-y-1">
+            <div className="text-center p-6 bg-primary-50 rounded-xl border border-primary-100">
+              <h3 className="text-lg font-bold text-primary-900 mb-2">تعليمات الاختبار</h3>
+              <ul className="text-sm text-primary-700 text-right list-disc list-inside mb-6 space-y-1">
                 <li>مدة الاختبار {quiz.duration} دقيقة، وسيبدأ المؤقت فور دخولك.</li>
                 <li>تأكد من استقرار اتصال الإنترنت قبل البدء.</li>
                 <li>يتم حفظ إجاباتك تلقائياً أثناء الحل.</li>
                 <li>سيتم تسليم إجاباتك تلقائياً عند انتهاء الوقت إذا لم تقم بالتسليم يدوياً.</li>
               </ul>
-              <Link to={`/student/quizzes/${quiz.id}/test`} className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-3 border border-transparent text-base font-bold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-200 transition-all hover:scale-105">
+              <Link to={`/student/quizzes/${quiz.id}/test`} className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-3 border border-transparent text-base font-bold rounded-lg text-white bg-primary-600 hover:bg-primary-700 shadow-md shadow-primary-200 transition-all hover:scale-105">
                 ابدأ الاختبار الآن
               </Link>
             </div>

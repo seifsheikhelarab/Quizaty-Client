@@ -6,7 +6,7 @@ interface SpinnerProps {
   className?: string;
 }
 
-export function Spinner({ size = "md", color = "text-indigo-600", className = "" }: SpinnerProps) {
+export function Spinner({ size = "md", color = "text-primary-600", className = "" }: SpinnerProps) {
   const sizeClasses = {
     sm: "w-4 h-4",
     md: "w-8 h-8",

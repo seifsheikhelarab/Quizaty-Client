@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, redirect } from "react-router";
 import { useState, useEffect } from "react";
 import { apiFetch } from "../utils/api";
 
@@ -10,6 +10,29 @@ export function meta() {
             content: "منصة Quizaty لإنشاء وإدارة الاختبارات الإلكترونية",
         },
     ];
+}
+
+export async function clientLoader() {
+    const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:7492/api";
+    
+    try {
+        const response = await fetch(`${API_BASE}/auth/me`, {
+            credentials: "include"
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.user.role === "teacher" || data.user.isAssistant) {
+                throw redirect("/teacher/dashboard");
+            } else if (data.user.role === "student") {
+                throw redirect("/student/dashboard");
+            }
+        }
+    } catch (e) {
+        if (e instanceof Response) throw e;
+        // Not logged in, stay on landing
+    }
+    return null;
 }
 
 interface PlanInfo {
@@ -67,10 +90,10 @@ const tierColors: Record<
         btn: "bg-sky-600 hover:bg-sky-700",
     },
     PRO: {
-        bg: "bg-indigo-50",
-        border: "border-indigo-300",
-        badge: "bg-indigo-100 text-indigo-700",
-        btn: "bg-indigo-600 hover:bg-indigo-700",
+        bg: "bg-primary-50",
+        border: "border-primary-300",
+        badge: "bg-primary-100 text-primary-700",
+        btn: "bg-primary-600 hover:bg-primary-700",
     },
     PREMIUM: {
         bg: "bg-amber-50",
@@ -92,13 +115,13 @@ function PricingCard({
 
     return (
         <div
-            className={`relative rounded-3xl border-2 ${colors.border} ${colors.bg} p-8 flex flex-col transition-transform hover:scale-[1.02] ${featured ? "shadow-2xl ring-2 ring-indigo-400 ring-offset-2" : "shadow-md"}`}
+            className={`relative rounded-3xl border-2 ${colors.border} ${colors.bg} p-8 flex flex-col transition-transform hover:scale-[1.02] ${featured ? "shadow-2xl ring-2 ring-primary-400 ring-offset-2" : "shadow-md"}`}
         >
-            {featured && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs font-black px-4 py-1.5 rounded-full shadow-lg">
-                    ⭐ الأكثر شعبية
-                </div>
-            )}
+                {featured && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary-600 text-white text-xs font-black px-4 py-1.5 rounded-full shadow-lg">
+                        ⭐ الأكثر شعبية
+                    </div>
+                )}
             <div className="text-center mb-6">
                 <span
                     className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${colors.badge} mb-3`}
@@ -124,7 +147,7 @@ function PricingCard({
 
             <ul className="space-y-3 flex-1 mb-8 text-sm">
                 <li className="flex items-center gap-2 flex-row-reverse">
-                    <span className="text-indigo-600 font-bold">👥</span>
+                    <span className="text-primary-600 font-bold">👥</span>
                     <span className="text-slate-700 font-medium">
                         {l.maxTotalStudents
                             ? `حتى ${l.maxTotalStudents} طالب`
@@ -132,7 +155,7 @@ function PricingCard({
                     </span>
                 </li>
                 <li className="flex items-center gap-2 flex-row-reverse">
-                    <span className="text-indigo-600 font-bold">📝</span>
+                    <span className="text-primary-600 font-bold">📝</span>
                     <span className="text-slate-700 font-medium">
                         {l.maxQuizzes
                             ? `${l.maxQuizzes} كويز فقط`
@@ -212,7 +235,7 @@ export default function LandingPage() {
             <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-slate-100 animate-reveal-down">
                 <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2 sm:gap-3 group cursor-pointer">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-600 rounded-xl flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-300">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary-600 rounded-xl flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-300">
                             <svg
                                 className="w-5 h-5 text-white"
                                 fill="none"
@@ -253,19 +276,19 @@ export default function LandingPage() {
                                     0,
                                 );
                             }}
-                            className="text-sm font-bold text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer"
+                            className="text-sm font-bold text-slate-600 hover:text-primary-600 transition-colors cursor-pointer"
                         >
                             الأسعار
                         </button>
                         <Link
                             to="/login"
-                            className="text-sm font-bold text-slate-600 hover:text-indigo-600 transition-colors"
+                            className="text-sm font-bold text-slate-600 hover:text-primary-600 transition-colors"
                         >
                             تسجيل الدخول
                         </Link>
                         <Link
                             to="/register"
-                            className="bg-indigo-600 text-white text-sm font-bold px-6 py-2.5 rounded-xl hover:bg-slate-900 transition-all shadow-md hover:shadow-indigo-200 animate-glow"
+                            className="bg-primary-600 text-white text-sm font-bold px-6 py-2.5 rounded-xl hover:bg-primary-700 transition-all shadow-md hover:shadow-primary-200 animate-glow"
                         >
                             ابدأ مجاناً
                         </Link>
@@ -273,7 +296,7 @@ export default function LandingPage() {
 
                     {/* Mobile Toggle */}
                     <button
-                        className="md:hidden p-2 text-slate-500 hover:text-indigo-600 transition-colors"
+                        className="md:hidden p-2 text-slate-500 hover:text-primary-600 transition-colors"
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     >
                         <svg
@@ -309,19 +332,19 @@ export default function LandingPage() {
                                 setActiveTab("pricing");
                                 setIsMobileMenuOpen(false);
                             }}
-                            className="block w-full text-right text-lg font-bold text-slate-700 hover:text-indigo-600"
+                            className="block w-full text-right text-lg font-bold text-slate-700 hover:text-primary-600"
                         >
                             الباقات والأسعار
                         </button>
                         <Link
                             to="/login"
-                            className="block w-full text-right text-lg font-bold text-slate-700 hover:text-indigo-600"
+                            className="block w-full text-right text-lg font-bold text-slate-700 hover:text-primary-600"
                         >
                             تسجيل الدخول
                         </Link>
                         <Link
                             to="/register"
-                            className="block w-full bg-indigo-600 text-white text-center font-bold py-4 rounded-2xl shadow-lg shadow-indigo-200"
+                            className="block w-full bg-primary-600 text-white text-center font-bold py-4 rounded-2xl shadow-lg shadow-primary-200"
                         >
                             ابدأ مجاناً الآن
                         </Link>
@@ -333,13 +356,13 @@ export default function LandingPage() {
                 {activeTab === "hero" ? (
                     <>
                         <section className="max-w-6xl mx-auto px-6 text-center pt-10 sm:pt-20 opacity-0 animate-reveal-up">
-                            <div className="inline-block bg-indigo-50 text-indigo-700 text-[10px] sm:text-xs font-black uppercase tracking-widest px-4 py-2 rounded-full mb-8 border border-indigo-100/50 animate-float">
+                            <div className="inline-block bg-primary-50 text-primary-700 text-[10px] sm:text-xs font-black uppercase tracking-widest px-4 py-2 rounded-full mb-8 border border-primary-100/50 animate-float">
                                 🚀 منصة الاختبارات الذكية الأولى في مصر
                             </div>
                             <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-slate-900 leading-[1.1] mb-8">
                                 أنشئ اختباراتك
                                 <br />
-                                <span className="bg-linear-to-l from-indigo-600 to-violet-600 bg-clip-text text-transparent">
+                                <span className="bg-linear-to-l from-primary-600 to-cyan-500 bg-clip-text text-transparent">
                                     بذكاء واحترافية
                                 </span>
                             </h1>
@@ -351,7 +374,7 @@ export default function LandingPage() {
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 px-4 opacity-0 animate-reveal-up delay-300">
                                 <Link
                                     to="/register"
-                                    className="w-full sm:w-auto bg-indigo-600 text-white font-black px-10 py-5 rounded-2xl hover:bg-slate-900 transition-all shadow-xl shadow-indigo-200 text-lg sm:text-xl active:scale-95 animate-glow"
+                                    className="w-full sm:w-auto bg-primary-600 text-white font-black px-10 py-5 rounded-2xl hover:bg-primary-700 transition-all shadow-xl shadow-primary-200 text-lg sm:text-xl active:scale-95 animate-glow"
                                 >
                                     انضم إلينا مجاناً
                                 </Link>
@@ -363,7 +386,7 @@ export default function LandingPage() {
                                             behavior: "smooth",
                                         });
                                     }}
-                                    className="w-full sm:w-auto bg-white border-2 border-slate-200 text-slate-700 font-black px-10 py-5 rounded-2xl hover:border-indigo-300 hover:text-indigo-600 transition-all text-lg sm:text-xl cursor-pointer hover:shadow-lg active:scale-95"
+                                    className="w-full sm:w-auto bg-white border-2 border-slate-200 text-slate-700 font-black px-10 py-5 rounded-2xl hover:border-primary-300 hover:text-primary-600 transition-all text-lg sm:text-xl cursor-pointer hover:shadow-lg active:scale-95"
                                 >
                                     شاهد الباقات
                                 </button>
@@ -394,12 +417,12 @@ export default function LandingPage() {
                                 ].map((f, i) => (
                                     <div
                                         key={i}
-                                        className="bg-white rounded-3xl border border-slate-100 p-10 hover:shadow-2xl hover:shadow-indigo-100 transition-all text-center group cursor-default"
+                                        className="bg-white rounded-3xl border border-slate-100 p-10 hover:shadow-2xl hover:shadow-primary-100 transition-all text-center group cursor-default"
                                     >
                                         <div className="text-5xl mb-6 transform group-hover:scale-110 group-hover:-rotate-3 transition-transform inline-block">
                                             {f.icon}
                                         </div>
-                                        <h3 className="text-xl font-black text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors">
+                                        <h3 className="text-xl font-black text-slate-900 mb-3 group-hover:text-primary-600 transition-colors">
                                             {f.title}
                                         </h3>
                                         <p className="text-slate-500 font-medium leading-relaxed">
@@ -412,7 +435,7 @@ export default function LandingPage() {
 
                         <section className="max-w-6xl mx-auto px-6 py-12 opacity-0 animate-reveal-up delay-500">
                             <div className="bg-slate-900 rounded-[3rem] p-10 sm:p-20 text-center relative overflow-hidden group">
-                                <div className="absolute top-0 left-0 w-full h-full bg-indigo-600/10 group-hover:bg-indigo-600/20 transition-colors" />
+                                <div className="absolute top-0 left-0 w-full h-full bg-primary-600/10 group-hover:bg-primary-600/20 transition-colors" />
                                 <h2 className="text-3xl sm:text-5xl font-black text-white mb-6 relative">
                                     جاهز للبدء؟
                                 </h2>
@@ -428,7 +451,7 @@ export default function LandingPage() {
                                             behavior: "smooth",
                                         });
                                     }}
-                                    className="bg-white text-slate-900 font-black px-12 py-5 rounded-2xl hover:bg-indigo-50 transition-colors text-lg sm:text-xl shadow-xl relative cursor-pointer active:scale-95"
+                                    className="bg-white text-slate-900 font-black px-12 py-5 rounded-2xl hover:bg-primary-50 transition-colors text-lg sm:text-xl shadow-xl relative cursor-pointer active:scale-95"
                                 >
                                     عرض الباقات والأسعار
                                 </button>
@@ -443,7 +466,7 @@ export default function LandingPage() {
                         >
                             <button
                                 onClick={() => setActiveTab("hero")}
-                                className="text-sm font-black text-indigo-600 hover:text-slate-900 mb-6 inline-flex items-center gap-2 px-6 py-2 bg-indigo-50 rounded-full transition-all cursor-pointer"
+                                className="text-sm font-black text-primary-600 hover:text-slate-900 mb-6 inline-flex items-center gap-2 px-6 py-2 bg-primary-50 rounded-full transition-all cursor-pointer"
                             >
                                 <svg
                                     className="w-4 h-4 rotate-180"
@@ -481,7 +504,7 @@ export default function LandingPage() {
                                 </div>
                             ) : (
                                 <div className="text-center py-20">
-                                    <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                                    <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                                     <p className="text-slate-500 font-bold">
                                         جاري تحميل الباقات...
                                     </p>
@@ -520,7 +543,7 @@ export default function LandingPage() {
                                             {plans.map((p) => (
                                                 <td
                                                     key={p.tier}
-                                                    className="text-center px-4 py-6 font-black text-indigo-600"
+                                                    className="text-center px-4 py-6 font-black text-primary-600"
                                                 >
                                                     {p.priceMonthly === 0
                                                         ? "مجاناً"
@@ -645,7 +668,7 @@ export default function LandingPage() {
             <footer className="border-t border-slate-100 bg-white relative z-10">
                 <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col items-center gap-4">
                     <div className="flex items-center gap-2 mb-2">
-                        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                        <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
                             <svg
                                 className="w-4 h-4 text-white"
                                 fill="none"

@@ -16,16 +16,19 @@ interface QuestionForm {
   text: string;
   options: string[];
   correctOption: number;
+  imageUrl?: string | null;
 }
 
 export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) {
-  const { classes, limits } = loaderData as { classes: { id: string; name: string }[], limits: any };
+  const data = loaderData as { classes?: { id: string; name: string }[]; limits?: any };
+  const classes = data?.classes || [];
+  const limits = data?.limits || {};
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedClasses, setSelectedClasses] = useState<string[]>([]);
   const [questions, setQuestions] = useState<QuestionForm[]>([
-    { text: "", options: ["", "", "", ""], correctOption: 0 },
+    { text: "", options: ["", "", "", ""], correctOption: 0, imageUrl: null },
   ]);
 
   // Question Bank State
@@ -74,7 +77,7 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
   };
 
   const addQuestion = () => {
-    setQuestions([...questions, { text: "", options: ["", "", "", ""], correctOption: 0 }]);
+    setQuestions([...questions, { text: "", options: ["", "", "", ""], correctOption: 0, imageUrl: null }]);
   };
 
   const removeQuestion = (index: number) => {
@@ -118,9 +121,10 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
           totalMarks,
           classIds: selectedClasses,
           questions: questions.map((q) => ({
-            text: q.text,
+            questionText: q.text,
             options: q.options,
             correctOption: q.correctOption,
+            imageUrl: q.imageUrl || null,
           })),
         }),
       });
@@ -132,7 +136,7 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
     }
   };
 
-  const inputCls = "block w-full border border-slate-300 rounded-lg shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-right";
+  const inputCls = "block w-full border border-slate-300 rounded-lg shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm text-right";
 
   return (
     <div className="max-w-3xl mx-auto text-right">
@@ -189,8 +193,8 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
                   onClick={() => toggleClass(c.id)}
                   className={`px-4 py-2 rounded-xl text-sm font-bold border transition-colors cursor-pointer ${
                     selectedClasses.includes(c.id)
-                      ? "bg-indigo-600 text-white border-indigo-600"
-                      : "bg-white text-slate-700 border-slate-200 hover:border-indigo-300"
+                      ? "bg-primary-600 text-white border-primary-600"
+                      : "bg-white text-slate-700 border-slate-200 hover:border-primary-300"
                   }`}
                 >
                   {c.name}
@@ -211,7 +215,7 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
                   استيراد من بنك الأسئلة
                 </button>
               )}
-              <button type="button" onClick={addQuestion} className="inline-flex items-center px-4 py-2 text-sm font-bold rounded-lg text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-colors cursor-pointer">
+              <button type="button" onClick={addQuestion} className="inline-flex items-center px-4 py-2 text-sm font-bold rounded-lg text-primary-600 bg-primary-50 hover:bg-primary-100 transition-colors cursor-pointer">
                 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
@@ -244,6 +248,65 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
                   className={inputCls}
                   placeholder="نص السؤال"
                 />
+                {/* Image Upload */}
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!!q.imageUrl}
+                      onChange={(e) => updateQuestion(qi, "imageUrl", e.target.checked ? "" : null)}
+                      className="rounded text-primary-600"
+                    />
+                    <span className="text-sm text-slate-600">إضافة صورة</span>
+                  </label>
+                  {q.imageUrl !== undefined && q.imageUrl !== null && (
+                    <div className="flex-1 flex items-center gap-3">
+                      <label className="flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg text-primary-600 bg-primary-50 hover:bg-primary-100 transition-colors cursor-pointer border border-primary-200">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        رفع صورة
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const formData = new FormData();
+                            formData.append("image", file);
+                            formData.append("questionIndex", qi.toString());
+                            try {
+                              const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:7492/api"}/teacher/quizzes/new/question-image`, {
+                                method: "POST",
+                                body: formData,
+                                credentials: "include"
+                              });
+                              const data = await res.json();
+                              if (data.imageUrl) {
+                                updateQuestion(qi, "imageUrl", data.imageUrl);
+                              } else if (data.error) {
+                                alert(data.error);
+                              }
+                            } catch (err) {
+                              alert("فشل رفع الصورة");
+                            }
+                          }}
+                        />
+                      </label>
+                      {q.imageUrl && (
+                        <div className="flex items-center gap-2">
+                          <img src={q.imageUrl} alt="Preview" className="mt-2 max-h-32 max-w-48 rounded-lg border border-slate-200" />
+                          <button
+                            type="button"
+                            onClick={() => updateQuestion(qi, "imageUrl", null)}
+                            className="text-rose-500 hover:text-rose-700 text-xs font-bold"
+                          >
+                            حذف
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
                 <div className="space-y-2">
                   {q.options.map((opt, oi) => (
                     <div key={oi} className="flex items-center gap-3 flex-row-reverse">
@@ -252,14 +315,14 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
                         name={`correct-${qi}`}
                         checked={q.correctOption === oi}
                         onChange={() => updateQuestion(qi, "correctOption", oi)}
-                        className="text-indigo-600 focus:ring-indigo-500"
+                        className="text-primary-600 focus:ring-primary-500"
                       />
                       <input
                         type="text"
                         value={opt}
                         onChange={(e) => updateOption(qi, oi, e.target.value)}
                         required
-                        className="flex-1 border border-slate-300 rounded-lg py-2 px-3 text-sm focus:ring-indigo-500 focus:border-indigo-500 text-right"
+                        className="flex-1 border border-slate-300 rounded-lg py-2 px-3 text-sm focus:ring-primary-500 focus:border-primary-500 text-right"
                         placeholder={`الخيار ${oi + 1}`}
                       />
                       {q.correctOption === oi && (
@@ -278,7 +341,7 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
           <Link to="/teacher/quizzes" className="px-6 py-3 border border-slate-300 text-sm font-bold rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors">
             إلغاء
           </Link>
-          <button type="submit" disabled={loading} className="px-8 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors disabled:opacity-50 cursor-pointer">
+          <button type="submit" disabled={loading} className="px-8 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-primary-600 hover:bg-primary-700 shadow-sm transition-colors disabled:opacity-50 cursor-pointer">
             {loading ? "جاري الإنشاء..." : "إنشاء الاختبار"}
           </button>
         </div>
@@ -309,7 +372,7 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
               ) : (
                 <div className="space-y-4">
                   {bankQuestions.map((bq) => (
-                    <div key={bq.id} className="border border-slate-200 rounded-xl p-4 hover:border-indigo-300 transition-all bg-white relative group">
+                    <div key={bq.id} className="border border-slate-200 rounded-xl p-4 hover:border-primary-300 transition-all bg-white relative group">
                       <p className="font-bold text-sm text-slate-900 mb-3">{bq.questionText}</p>
                       <ul className="grid grid-cols-2 gap-2 mb-4">
                         {bq.options.map((opt: string, i: number) => (
@@ -321,7 +384,7 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
                       <button 
                         type="button" 
                         onClick={() => { importQuestion(bq); setShowBankModal(false); }}
-                        className="w-full py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white font-bold text-sm rounded-lg transition-colors cursor-pointer"
+                        className="w-full py-2 bg-primary-50 text-primary-700 hover:bg-primary-600 hover:text-white font-bold text-sm rounded-lg transition-colors cursor-pointer"
                       >
                         إضافة للاختبار الحالي
                       </button>

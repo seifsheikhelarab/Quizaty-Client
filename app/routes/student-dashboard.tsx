@@ -18,7 +18,9 @@ export async function clientLoader() {
 }
 
 export default function StudentDashboard({ loaderData }: Route.ComponentProps) {
-  const { student, stats } = loaderData as { student: { name: string }; stats: { upcomingQuizzes: number; classes: number } };
+  const data = loaderData as { student?: { name: string }; stats?: { upcomingQuizzes: number; classes: number } };
+  const student = data?.student || { name: "" };
+  const stats = data?.stats || { upcomingQuizzes: 0, classes: 0 };
 
   return (
     <div className="text-right">
@@ -30,14 +32,14 @@ export default function StudentDashboard({ loaderData }: Route.ComponentProps) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <Link to="/student/quizzes" className="block bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all duration-200 group opacity-0 animate-reveal-up delay-100">
+        <Link to="/student/quizzes" className="block bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-primary-300 transition-all duration-200 group opacity-0 animate-reveal-up delay-100">
           <div className="flex items-center justify-between mb-4 flex-row-reverse">
-            <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform">
+            <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 group-hover:scale-110 transition-transform">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
               </svg>
             </div>
-            <svg className="w-5 h-5 text-slate-300 group-hover:text-indigo-400 transition-colors rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-slate-300 group-hover:text-primary-400 transition-colors rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </div>

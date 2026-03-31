@@ -33,7 +33,7 @@ export default function TeacherCreateClass() {
     }
   };
 
-  const inputCls = "block w-full border border-slate-300 rounded-lg shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-right";
+  const inputCls = "block w-full border border-slate-300 rounded-lg shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm text-right";
 
   return (
     <div className="max-w-xl mx-auto text-right">
@@ -72,7 +72,7 @@ export default function TeacherCreateClass() {
             <Link to="/teacher/classes" className="inline-flex items-center justify-center px-4 py-2 border border-slate-300 shadow-sm text-sm font-bold rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors">
               إلغاء
             </Link>
-            <button type="submit" disabled={loading} className="inline-flex items-center justify-center px-6 py-2 border border-transparent text-sm font-bold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors disabled:opacity-50 cursor-pointer">
+            <button type="submit" disabled={loading} className="inline-flex items-center justify-center px-6 py-2 border border-transparent text-sm font-bold rounded-lg text-white bg-primary-600 hover:bg-primary-700 shadow-sm transition-colors disabled:opacity-50 cursor-pointer">
               {loading ? "جاري الإنشاء..." : "إنشاء الفصل"}
             </button>
           </div>

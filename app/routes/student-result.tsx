@@ -13,6 +13,13 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 
 export default function StudentResult({ loaderData }: Route.ComponentProps) {
   const { submission } = loaderData as any;
+  if (!submission?.quiz) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-slate-500">حدث خطأ في تحميل النتيجة</p>
+      </div>
+    );
+  }
   const quiz = submission.quiz;
   const timeTakenMins = submission.submittedAt
     ? ((new Date(submission.submittedAt).getTime() - new Date(submission.startedAt).getTime()) / 60000).toFixed(1)
@@ -28,14 +35,14 @@ export default function StudentResult({ loaderData }: Route.ComponentProps) {
   return (
     <div className="max-w-4xl mx-auto text-right">
       <div className="mb-8 opacity-0 animate-reveal-up">
-        <Link to="/student/quizzes" className="inline-flex items-center text-sm font-bold text-indigo-600 hover:text-indigo-800 mb-4 transition-colors group">
+        <Link to="/student/quizzes" className="inline-flex items-center text-sm font-bold text-primary-600 hover:text-primary-800 mb-4 transition-colors group">
           <svg className="w-4 h-4 mr-1 rotate-180 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           العودة للاختبارات
         </Link>
         <div>
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-indigo-50 text-indigo-700 mb-3 border border-indigo-100 uppercase tracking-wide">{quiz.title}</span>
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-primary-50 text-primary-700 mb-3 border border-primary-100 uppercase tracking-wide">{quiz.title}</span>
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">تفاصيل التسليم</h2>
         </div>
 
@@ -142,10 +149,10 @@ export default function StudentResult({ loaderData }: Route.ComponentProps) {
             <p className="text-slate-500 max-w-sm mx-auto leading-relaxed">
               لقد أكملت الاختبار بنجاح. سيقوم المعلم بإصدار النتائج وتوزيع الدرجات بمجرد انتهاء وقت الاختبار للجميع.
             </p>
-            <div className="mt-8 flex items-center justify-center gap-2 text-indigo-600 font-bold text-sm">
+            <div className="mt-8 flex items-center justify-center gap-2 text-primary-600 font-bold text-sm">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
               </span>
               يتم الآن مراجعة الاختبار
             </div>
@@ -154,7 +161,7 @@ export default function StudentResult({ loaderData }: Route.ComponentProps) {
       </div>
 
       <div className="mt-12 opacity-0 animate-reveal-up delay-500">
-        <Link to="/student/quizzes" className="w-full inline-block text-center bg-slate-900 text-white font-black py-5 rounded-2xl hover:bg-slate-800 transition-all shadow-2xl shadow-slate-200 active:scale-95">
+        <Link to="/student/quizzes" className="w-full inline-block text-center bg-primary-600 text-white font-black py-5 rounded-2xl hover:bg-primary-700 transition-all shadow-2xl shadow-primary-100 active:scale-95">
           العودة لقائمة الاختبارات
         </Link>
       </div>

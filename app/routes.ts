@@ -27,12 +27,14 @@ export default [
     route("teacher/assistants", "routes/teacher-assistants.tsx"),
     route("teacher/question-bank", "routes/teacher-question-bank.tsx"),
     route("teacher/question-bank/ocr", "routes/teacher-ocr-upload.tsx"),
+    route("teacher/subscription", "routes/teacher-subscription.tsx"),
   ]),
 
   // Student routes (with authenticated layout)
   layout("routes/student-layout.tsx", [
     route("student/dashboard", "routes/student-dashboard.tsx"),
     route("student/classes", "routes/student-classes.tsx"),
+    route("student/classes/:id", "routes/student-class-detail.tsx"),
     route("student/quizzes", "routes/student-quizzes.tsx"),
     route("student/quizzes/:id", "routes/student-quiz-detail.tsx"),
     route("student/quizzes/:id/test", "routes/student-quiz-test.tsx"),

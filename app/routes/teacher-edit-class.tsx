@@ -13,10 +13,19 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 }
 
 export default function TeacherEditClass({ loaderData }: Route.ComponentProps) {
-  const { classData } = loaderData as { classData: { id: string; name: string; description: string | null } };
+  const data = loaderData as { classData?: { id: string; name: string; description: string | null } };
+  const classData = data?.classData;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  if (!classData) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-slate-500">حدث خطأ في تحميل البيانات</p>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,7 +48,7 @@ export default function TeacherEditClass({ loaderData }: Route.ComponentProps) {
     }
   };
 
-  const inputCls = "block w-full border border-slate-300 rounded-lg py-2.5 px-4 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-right";
+  const inputCls = "block w-full border border-slate-300 rounded-lg py-2.5 px-4 focus:ring-primary-500 focus:border-primary-500 sm:text-sm text-right";
 
   return (
     <div className="max-w-xl mx-auto text-right">
@@ -72,7 +81,7 @@ export default function TeacherEditClass({ loaderData }: Route.ComponentProps) {
           <Link to={`/teacher/classes/${classData.id}`} className="inline-flex items-center justify-center px-6 py-3 border border-slate-300 shadow-sm text-sm font-bold rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors">
             إلغاء
           </Link>
-          <button type="submit" disabled={loading} className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors disabled:opacity-50 cursor-pointer">
+          <button type="submit" disabled={loading} className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-primary-600 hover:bg-primary-700 shadow-sm transition-colors disabled:opacity-50 cursor-pointer">
             {loading ? "جاري الحفظ..." : "حفظ التغييرات"}
           </button>
         </div>

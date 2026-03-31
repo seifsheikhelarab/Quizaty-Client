@@ -33,7 +33,18 @@ interface SubmissionData {
 }
 
 export default function TeacherSubmissionDetail({ loaderData }: Route.ComponentProps) {
-  const { quiz, submission } = loaderData as SubmissionData;
+  const data = loaderData as SubmissionData;
+  const quiz = data?.quiz;
+  const submission = data?.submission;
+
+  if (!quiz || !submission) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-slate-500">حدث خطأ في تحميل البيانات</p>
+      </div>
+    );
+  }
+
   const timeMins = submission.submittedAt
     ? ((new Date(submission.submittedAt).getTime() - new Date(submission.startedAt).getTime()) / 60000).toFixed(1)
     : "-";
@@ -44,7 +55,7 @@ export default function TeacherSubmissionDetail({ loaderData }: Route.ComponentP
         <p className="text-sm text-slate-500 mb-1">تقديم في: {quiz.title}</p>
         <h2 className="text-3xl font-black text-slate-900 tracking-tight">{submission.student.name}</h2>
         <div className="mt-3 flex items-center gap-4 flex-row-reverse">
-          <span className="text-lg font-black text-indigo-600">{submission.score}/{quiz.totalMarks}</span>
+          <span className="text-lg font-black text-primary-600">{submission.score}/{quiz.totalMarks}</span>
           <span className="text-sm text-slate-500">{timeMins} دقيقة</span>
         </div>
       </div>
@@ -76,7 +87,7 @@ export default function TeacherSubmissionDetail({ loaderData }: Route.ComponentP
 
       {/* Questions Review */}
       <div className="space-y-6">
-        {quiz.questions.map((q, i) => {
+        {(quiz.questions || []).map((q, i) => {
           const studentAnswer = submission.answers?.[i] ?? -1;
           const isCorrect = studentAnswer === q.correctOption;
           return (

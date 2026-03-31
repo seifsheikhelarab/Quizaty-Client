@@ -20,7 +20,8 @@ interface ClassItem {
 }
 
 export default function TeacherClasses({ loaderData }: Route.ComponentProps) {
-  const { classes } = loaderData as { classes: ClassItem[] };
+  const data = loaderData as { classes?: ClassItem[] };
+  const classes = data?.classes || [];
   const [search, setSearch] = useState("");
 
   const filtered = classes.filter((c) =>
@@ -50,12 +51,12 @@ export default function TeacherClasses({ loaderData }: Route.ComponentProps) {
               placeholder="ابحث عن الفصول..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pr-10 pl-4 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-64"
+              className="pr-10 pl-4 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-64"
             />
           </div>
           <Link
             to="/teacher/classes/create"
-            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-black rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none shadow-lg shadow-indigo-100 transition-all transform hover:-translate-y-0.5 animate-glow"
+            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-black rounded-xl text-white bg-primary-600 hover:bg-primary-700 focus:outline-none shadow-lg shadow-primary-100 transition-all transform hover:-translate-y-0.5 animate-glow"
           >
             <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -67,29 +68,30 @@ export default function TeacherClasses({ loaderData }: Route.ComponentProps) {
 
       {classes.length === 0 ? (
         <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center opacity-0 animate-reveal-up delay-200">
-          <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-20 h-20 bg-primary-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+            <svg className="w-10 h-10 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
           </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد فصول بعد</h3>
-          <p className="text-slate-500 max-w-sm mx-auto mb-6">قم بإنشاء فصول لتنظيم طلابك وتعيين الاختبارات لمجموعات محددة.</p>
-          <Link to="/teacher/classes/create" className="inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-bold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none shadow-sm transition-colors animate-glow">
-            إنشاء أول فصل لك
+          <h3 className="text-xl font-black text-slate-900 mb-3">لا توجد فصول دراسية</h3>
+          <p className="text-slate-500 max-w-sm mx-auto mb-6">الفصول تساعدك في تنظيم طلابك في مجموعات. أنشئ فصلاً لإضافة الطلاب وتعيين الاختبارات.</p>
+          <Link to="/teacher/classes/create" className="inline-flex items-center justify-center px-6 py-3 text-base font-bold rounded-xl text-white bg-primary-600 hover:bg-primary-700 shadow-lg transition-all hover:-translate-y-0.5">
+            إنشاء فصل جديد
           </Link>
+          <p className="text-xs text-slate-400 mt-4">💡 الفصول تساعدك في تنظيم طلابك وتعيين الاختبارات لكل مجموعة</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((c, i) => (
             <div 
               key={c.id} 
-              className={`bg-white rounded-3xl border border-slate-200 p-6 flex flex-col hover:shadow-xl hover:border-indigo-300 transition-all duration-300 group opacity-0 animate-reveal-up ${
+              className={`bg-white rounded-3xl border border-slate-200 p-6 flex flex-col hover:shadow-xl hover:border-primary-300 transition-all duration-300 group opacity-0 animate-reveal-up ${
                 i === 0 ? "delay-100" : i === 1 ? "delay-200" : i === 2 ? "delay-300" : "delay-300"
               }`}
             >
               <div className="flex justify-between items-start mb-6 flex-row-reverse">
-                <h3 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors">{c.name}</h3>
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-indigo-50 text-indigo-700 border border-indigo-100">
+                <h3 className="text-xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">{c.name}</h3>
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-primary-50 text-primary-700 border border-primary-100">
                   {c._count.students} طالب
                 </span>
               </div>

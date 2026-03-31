@@ -154,7 +154,7 @@ export default function TeacherOcrUpload({ loaderData }: Route.ComponentProps) {
               onDrop={handleDrop}
               onDragOver={(e) => e.preventDefault()}
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center hover:border-indigo-400 transition-colors cursor-pointer"
+              className="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center hover:border-primary-400 transition-colors cursor-pointer"
             >
               <input
                 ref={fileInputRef}
@@ -245,7 +245,7 @@ export default function TeacherOcrUpload({ loaderData }: Route.ComponentProps) {
             {extractedQuestions.map((q, index) => (
               <div key={index} className="bg-white rounded-2xl border border-slate-200 p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold">
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 text-primary-700 text-sm font-bold">
                     {index + 1}
                   </span>
                   <span className="text-sm text-slate-500">السؤال {index + 1}</span>

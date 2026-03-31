@@ -1,9 +1,32 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, redirect } from "react-router";
 import { apiFetch } from "../utils/api";
 
 export function meta() {
     return [{ title: "تسجيل الدخول | Quizaty" }];
+}
+
+export async function clientLoader() {
+    const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:7492/api";
+    
+    try {
+        const response = await fetch(`${API_BASE}/auth/me`, {
+            credentials: "include"
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.user.role === "teacher" || data.user.isAssistant) {
+                throw redirect("/teacher/dashboard");
+            } else if (data.user.role === "student") {
+                throw redirect("/student/dashboard");
+            }
+        }
+    } catch (e) {
+        if (e instanceof Response) throw e;
+        // Not logged in, stay on login
+    }
+    return null;
 }
 
 export default function LoginPage() {
@@ -57,24 +80,24 @@ export default function LoginPage() {
     };
 
     const activeBtn =
-        "w-1/2 py-2.5 text-sm font-black rounded-xl bg-white shadow-sm text-indigo-600 transition-all duration-200";
+        "w-1/2 py-2.5 text-sm font-black rounded-xl bg-white shadow-sm text-primary-600 transition-all duration-200";
     const inactiveBtn =
         "w-1/2 py-2.5 text-sm font-bold rounded-xl text-slate-500 hover:text-slate-900 transition-all duration-200";
 
     return (
-        <div className="bg-slate-50 min-h-screen flex items-center justify-center p-6 text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 overflow-hidden relative">
+        <div className="bg-slate-50 min-h-screen flex items-center justify-center p-6 text-slate-900 selection:bg-primary-100 selection:text-primary-900 overflow-hidden relative">
             {/* Background Decorative Element */}
-            <div className="absolute top-0 -left-64 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 -right-64 w-[500px] h-[500px] bg-violet-500/5 rounded-full blur-3xl" />
+            <div className="absolute top-0 -left-64 w-[500px] h-[500px] bg-primary-500/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 -right-64 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-3xl" />
 
             <div className="max-w-md mx-auto w-full bg-white rounded-4xl shadow-2xl border border-slate-100 p-10 relative overflow-hidden opacity-0 animate-reveal-up">
                 {/* Accent Line */}
-                <div className="absolute top-0 right-0 w-full h-1.5 bg-indigo-500" />
+                <div className="absolute top-0 right-0 w-full h-1.5 bg-primary-500" />
 
                 <div className="text-center mb-10">
-                    <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-float">
+                    <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-float">
                         <svg
-                            className="w-8 h-8 text-indigo-600"
+                            className="w-8 h-8 text-primary-600"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -148,7 +171,7 @@ export default function LoginPage() {
                                 رقم الهاتف
                             </label>
                             <input
-                                className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all outline-none font-medium placeholder:text-slate-400 text-right"
+                                className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-4 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all outline-none font-medium placeholder:text-slate-400 text-right"
                                 id="phone"
                                 type="tel"
                                 name="phone"
@@ -167,7 +190,7 @@ export default function LoginPage() {
                                 البريد الإلكتروني
                             </label>
                             <input
-                                className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all outline-none font-medium placeholder:text-slate-400 text-right"
+                                className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-4 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all outline-none font-medium placeholder:text-slate-400 text-right"
                                 id="email"
                                 type="email"
                                 name="email"
@@ -185,8 +208,8 @@ export default function LoginPage() {
                             كلمة المرور
                         </label>
                         <input
-                            className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all outline-none font-medium placeholder:text-slate-400 text-right"
-                            id="password"
+                                className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-4 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all outline-none font-medium placeholder:text-slate-400 text-right"
+                                id="password"
                             type="password"
                             name="password"
                             placeholder="••••••••"
@@ -195,7 +218,7 @@ export default function LoginPage() {
                     </div>
 
                     <button
-                        className="w-full bg-indigo-600 text-white font-bold py-4 px-6 rounded-xl hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500/50 transition-all shadow-lg hover:shadow-indigo-500/30 outline-none flex items-center justify-center space-x-2 space-x-reverse disabled:opacity-50 cursor-pointer"
+                        className="w-full bg-primary-600 text-white font-bold py-4 px-6 rounded-xl hover:bg-primary-700 focus:ring-4 focus:ring-primary-500/50 transition-all shadow-lg hover:shadow-primary-500/30 outline-none flex items-center justify-center space-x-2 space-x-reverse disabled:opacity-50 cursor-pointer"
                         type="submit"
                         disabled={loading}
                     >
@@ -225,7 +248,7 @@ export default function LoginPage() {
                         ليس لديك حساب؟
                         <Link
                             to="/register"
-                            className="text-indigo-600 hover:text-indigo-700 font-bold hover:underline underline-offset-4 mr-1"
+                            className="text-primary-600 hover:text-primary-700 font-bold hover:underline underline-offset-4 mr-1"
                         >
                             أنشئ حساباً جديداً
                         </Link>

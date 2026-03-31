@@ -39,16 +39,33 @@ interface QuizData {
     totalMarks: number;
     showResults: boolean;
     questions: Question[];
-    classes: { id: string; name: string; _count: { students: number } }[];
+    classes: { id: string; name: string; _count?: { students: number } }[];
   };
   analysis: Record<string, string>;
   leaderboard: Submission[];
   submissions: Submission[];
-  limits: Record<string, any>;
+  limits?: Record<string, any>;
+  nonAttempted?: any[];
+  studentsWithViolations?: any[];
 }
 
 export default function TeacherQuizDetail({ loaderData }: Route.ComponentProps) {
-  const { quiz, analysis, leaderboard, submissions, limits } = loaderData as QuizData;
+  const data = loaderData as QuizData;
+  const quiz = data?.quiz;
+  const analysis = data?.analysis || {};
+  const leaderboard = data?.leaderboard || [];
+  const submissions = data?.submissions || [];
+  const limits = data?.limits || {};
+  const nonAttempted = data?.nonAttempted || [];
+  const studentsWithViolations = data?.studentsWithViolations || [];
+
+  if (!quiz) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-slate-500">حدث خطأ في تحميل البيانات</p>
+      </div>
+    );
+  }
 
   const handleReleaseResults = async () => {
     await apiFetch(`/teacher/quizzes/${quiz.id}/release-results`, { method: "POST" });
@@ -84,7 +101,7 @@ export default function TeacherQuizDetail({ loaderData }: Route.ComponentProps) 
           {quiz.description && <p className="text-slate-500 mt-2 text-sm">{quiz.description}</p>}
         </div>
         <div className="mt-4 md:mt-0 flex items-center space-x-3 space-x-reverse flex-wrap gap-y-2">
-          {limits.reports !== 'basic' && (
+          {limits?.reports && limits.reports !== 'basic' && (
             <a 
               href={`${API_BASE}/teacher/quizzes/${quiz.id}/export`} 
               target="_blank" 
@@ -98,7 +115,7 @@ export default function TeacherQuizDetail({ loaderData }: Route.ComponentProps) 
           )}
           <Link to={`/teacher/quizzes/${quiz.id}/edit`} className="px-4 py-2 border border-slate-300 text-sm font-bold rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors">تعديل</Link>
           {!quiz.showResults && (
-            <button onClick={handleReleaseResults} className="px-4 py-2 border border-transparent text-sm font-bold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 transition-colors cursor-pointer">إعلان النتائج</button>
+            <button onClick={handleReleaseResults} className="px-4 py-2 border border-transparent text-sm font-bold rounded-lg text-white bg-primary-600 hover:bg-primary-700 transition-colors cursor-pointer">إعلان النتائج</button>
           )}
           <button onClick={handleDelete} className="px-4 py-2 border border-slate-300 text-sm font-bold rounded-lg text-rose-600 bg-white hover:bg-rose-50 transition-colors cursor-pointer">حذف</button>
         </div>
@@ -107,7 +124,7 @@ export default function TeacherQuizDetail({ loaderData }: Route.ComponentProps) 
       {/* Info Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
-          <p className="text-2xl font-black text-slate-900">{quiz.questions.length}</p>
+          <p className="text-2xl font-black text-slate-900">{quiz.questions?.length || 0}</p>
           <p className="text-xs text-slate-500 font-medium mt-1">سؤال</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
@@ -136,7 +153,7 @@ export default function TeacherQuizDetail({ loaderData }: Route.ComponentProps) 
                 <p className="text-xs text-slate-500">أعلى درجة</p>
               </div>
               <div className="text-center">
-                <p className="text-lg font-black text-indigo-600">{analysis.avgScore}</p>
+                <p className="text-lg font-black text-primary-600">{analysis.avgScore}</p>
                 <p className="text-xs text-slate-500">المتوسط</p>
               </div>
               <div className="text-center">
@@ -147,7 +164,7 @@ export default function TeacherQuizDetail({ loaderData }: Route.ComponentProps) 
           </div>
 
           {/* Leaderboard */}
-          {limits.leaderboard && leaderboard.length > 0 && (
+          {limits?.leaderboard && leaderboard.length > 0 && (
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
               <h3 className="text-lg font-bold text-slate-900 mb-4">المتصدرون</h3>
               <div className="space-y-3">
@@ -159,7 +176,7 @@ export default function TeacherQuizDetail({ loaderData }: Route.ComponentProps) 
                       </span>
                       <span className="font-bold text-sm text-slate-900">{sub.student.name}</span>
                     </div>
-                    <span className="text-sm font-bold text-indigo-600">{sub.score}/{quiz.totalMarks}</span>
+                    <span className="text-sm font-bold text-primary-600">{sub.score}/{quiz.totalMarks}</span>
                   </div>
                 ))}
               </div>
@@ -169,9 +186,9 @@ export default function TeacherQuizDetail({ loaderData }: Route.ComponentProps) 
           {/* Submissions Table */}
           <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
             <div className="px-6 py-5 border-b border-slate-100 bg-slate-50">
-              <h3 className="text-lg font-bold text-slate-900">التقديمات ({submissions.length})</h3>
+              <h3 className="text-lg font-bold text-slate-900">التقديمات ({submissions?.length || 0})</h3>
             </div>
-            {submissions.length === 0 ? (
+            {(!submissions || submissions.length === 0) ? (
               <div className="p-8 text-center text-slate-500 text-sm">لا توجد تقديمات بعد.</div>
             ) : (
               <div className="overflow-x-auto">
@@ -190,10 +207,10 @@ export default function TeacherQuizDetail({ loaderData }: Route.ComponentProps) 
                       return (
                         <tr key={sub.id} className="hover:bg-slate-50">
                           <td className="px-6 py-4 font-medium text-slate-900">{sub.student.name}</td>
-                          <td className="px-6 py-4 font-bold text-indigo-600">{sub.score}/{quiz.totalMarks}</td>
+                          <td className="px-6 py-4 font-bold text-primary-600">{sub.score}/{quiz.totalMarks}</td>
                           <td className="px-6 py-4 text-slate-500">{timeMins} دقيقة</td>
                           <td className="px-6 py-4">
-                            <Link to={`/teacher/quizzes/${quiz.id}/submissions/${sub.id}`} className="text-indigo-600 hover:text-indigo-800 text-xs font-bold">عرض</Link>
+                            <Link to={`/teacher/quizzes/${quiz.id}/submissions/${sub.id}`} className="text-primary-600 hover:text-primary-800 text-xs font-bold">عرض</Link>
                           </td>
                         </tr>
                       );
@@ -204,6 +221,78 @@ export default function TeacherQuizDetail({ loaderData }: Route.ComponentProps) 
             )}
           </div>
         </div>
+
+        {/* Non-Attempted Students (WhatsApp) */}
+        {limits?.whatsapp !== 'none' && nonAttempted && nonAttempted.length > 0 && (
+          <div className="bg-white rounded-2xl border border-amber-200 p-6">
+            <h3 className="text-lg font-bold text-amber-800 mb-4">الطلاب الذين لم يقدموا الاختبار</h3>
+            <div className="space-y-2">
+              {nonAttempted.map((student: any) => (
+                <div key={student.id} className="flex items-center justify-between p-3 bg-amber-50 rounded-xl">
+                  <div className="text-right">
+                    <p className="font-bold text-slate-900">{student.name}</p>
+                    <p className="text-xs text-slate-500">{student.phone}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    {student.parentPhone && (
+                      <a
+                        href={`https://wa.me/${student.parentPhone.startsWith('0') ? '20' + student.parentPhone.slice(1) : student.parentPhone}?text=${encodeURIComponent(`ن提醒: لم يقدم hijo/a ${student.name} الاختبار. يرجى التشجيع على تقديمه.`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 bg-emerald-500 text-white text-xs font-bold rounded-lg hover:bg-emerald-600"
+                      >
+                        واتساب ولي الأمر
+                      </a>
+                    )}
+                    <a
+                      href={`https://wa.me/${student.phone.startsWith('0') ? '20' + student.phone.slice(1) : student.phone}?text=${encodeURIComponent(`مرحباً ${student.name}، لم تقم بتقديم الاختبار "${quiz.title}". يرجى الدخول وإجراء الاختبار.`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 bg-emerald-500 text-white text-xs font-bold rounded-lg hover:bg-emerald-600"
+                    >
+                      واتساب
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Students with Violations */}
+        {limits?.whatsapp !== 'none' && studentsWithViolations && studentsWithViolations.length > 0 && (
+          <div className="bg-white rounded-2xl border border-rose-200 p-6">
+            <h3 className="text-lg font-bold text-rose-800 mb-4">طلاب لديهم مخالفات</h3>
+            <div className="space-y-2">
+              {studentsWithViolations.map((item: any) => (
+                <div key={item.id} className="flex items-center justify-between p-3 bg-rose-50 rounded-xl">
+                  <div className="text-right">
+                    <p className="font-bold text-slate-900">{item.student.name}</p>
+                    <p className="text-xs text-rose-600">مخالفات: {item.violations?.length || 0}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    {item.student.parentPhone && (
+                      <a
+                        href={`https://wa.me/${item.student.parentPhone.startsWith('0') ? '20' + item.student.parentPhone.slice(1) : item.student.parentPhone}?text=${encodeURIComponent(`تنبيه: تم تسجيل مخالفات أثناء خوض child ${item.student.name} للاختبار. يرجى التحدث معه.`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 bg-emerald-500 text-white text-xs font-bold rounded-lg hover:bg-emerald-600"
+                      >
+                        واتساب ولي الأمر
+                      </a>
+                    )}
+                    <Link
+                      to={`/teacher/quizzes/${quiz.id}/submissions/${item.id}`}
+                      className="px-3 py-1.5 border border-rose-300 text-rose-700 text-xs font-bold rounded-lg hover:bg-rose-100"
+                    >
+                      عرض
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Sidebar: Classes & Date */}
         <div className="space-y-6">
@@ -221,14 +310,14 @@ export default function TeacherQuizDetail({ loaderData }: Route.ComponentProps) 
             </div>
           </div>
 
-          {quiz.classes.length > 0 && (
+          {quiz.classes?.length > 0 && (
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
               <h3 className="text-lg font-bold text-slate-900 mb-4">الفصول المسندة</h3>
               <div className="space-y-2">
-                {quiz.classes.map((c) => (
+                {(quiz.classes || []).map((c) => (
                   <Link key={c.id} to={`/teacher/classes/${c.id}`} className="block p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
                     <span className="font-bold text-sm text-slate-900">{c.name}</span>
-                    <span className="text-xs text-slate-500 mr-2">({c._count.students} طالب)</span>
+                    <span className="text-xs text-slate-500 mr-2">({c._count?.students || 0} طالب)</span>
                   </Link>
                 ))}
               </div>

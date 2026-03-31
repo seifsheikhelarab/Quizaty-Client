@@ -36,6 +36,15 @@ interface ClassData {
 
 export default function TeacherClassDetail({ loaderData }: Route.ComponentProps) {
   const { classData, limits } = loaderData as { classData: ClassData; limits: any };
+  
+  if (!classData) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-slate-500">حدث خطأ في تحميل البيانات</p>
+      </div>
+    );
+  }
+  
   const [studentName, setStudentName] = useState("");
   const [studentPhone, setStudentPhone] = useState("");
   const [adding, setAdding] = useState(false);
@@ -91,7 +100,7 @@ export default function TeacherClassDetail({ loaderData }: Route.ComponentProps)
         <div className="mt-4 md:mt-0 flex flex-wrap items-center gap-3">
           <button
             onClick={handleCopyInvite}
-            className="inline-flex items-center justify-center px-4 py-2 border border-indigo-200 text-sm font-bold rounded-lg text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center px-4 py-2 border border-primary-200 text-sm font-bold rounded-lg text-primary-700 bg-primary-50 hover:bg-primary-100 transition-colors cursor-pointer"
           >
             {copied ? "تم النسخ!" : "نسخ رابط الدعوة"}
           </button>
@@ -128,7 +137,7 @@ export default function TeacherClassDetail({ loaderData }: Route.ComponentProps)
                     value={studentName}
                     onChange={(e) => setStudentName(e.target.value)}
                     required
-                    className="block w-full border border-slate-300 rounded-lg py-2 px-3 text-sm focus:ring-indigo-500 focus:border-indigo-500 text-right"
+                    className="block w-full border border-slate-300 rounded-lg py-2 px-3 text-sm focus:ring-primary-500 focus:border-primary-500 text-right"
                   />
                 </div>
                 <div className="grow">
@@ -138,14 +147,14 @@ export default function TeacherClassDetail({ loaderData }: Route.ComponentProps)
                     value={studentPhone}
                     onChange={(e) => setStudentPhone(e.target.value)}
                     required
-                    className="block w-full border border-slate-300 rounded-lg py-2 px-3 text-sm focus:ring-indigo-500 focus:border-indigo-500 text-right"
+                    className="block w-full border border-slate-300 rounded-lg py-2 px-3 text-sm focus:ring-primary-500 focus:border-primary-500 text-right"
                   />
                 </div>
                 <div>
                   <button
                     type="submit"
                     disabled={adding}
-                    className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2 border border-transparent text-sm font-bold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors whitespace-nowrap cursor-pointer disabled:opacity-50"
+                    className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2 border border-transparent text-sm font-bold rounded-lg text-white bg-primary-600 hover:bg-primary-700 shadow-sm transition-colors whitespace-nowrap cursor-pointer disabled:opacity-50"
                   >
                     <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -169,7 +178,7 @@ export default function TeacherClassDetail({ loaderData }: Route.ComponentProps)
                         <p className="text-sm font-bold text-slate-900">{student.name}</p>
                         <p className="text-xs text-slate-500 mt-0.5">{student.phone}</p>
                         {student.shortCode && (
-                          <p className="text-xs font-mono text-indigo-600 mt-0.5">الكود: {student.shortCode}</p>
+                          <p className="text-xs font-mono text-primary-600 mt-0.5">الكود: {student.shortCode}</p>
                         )}
                       </div>
                       <div className="flex items-center space-x-4 space-x-reverse">
@@ -186,7 +195,7 @@ export default function TeacherClassDetail({ loaderData }: Route.ComponentProps)
                             </svg>
                           </a>
                         )}
-                        <Link to={`/teacher/students/${student.id}`} className="text-indigo-600 hover:text-indigo-800 text-sm font-bold transition-colors">عرض</Link>
+                        <Link to={`/teacher/students/${student.id}`} className="text-primary-600 hover:text-primary-800 text-sm font-bold transition-colors">عرض</Link>
                         <button
                           onClick={() => handleRemoveStudent(student.id)}
                           className="text-slate-400 hover:text-rose-600 transition-colors p-1 cursor-pointer"
@@ -221,9 +230,9 @@ export default function TeacherClassDetail({ loaderData }: Route.ComponentProps)
                     <Link
                       key={quiz.id}
                       to={`/teacher/quizzes/${quiz.id}`}
-                      className="block p-4 rounded-xl border border-slate-100 bg-white hover:border-indigo-200 hover:shadow-sm transition-all group"
+                      className="block p-4 rounded-xl border border-slate-100 bg-white hover:border-primary-200 hover:shadow-sm transition-all group"
                     >
-                      <h4 className="font-bold text-slate-900 text-sm group-hover:text-indigo-600 transition-colors">{quiz.title}</h4>
+                      <h4 className="font-bold text-slate-900 text-sm group-hover:text-primary-600 transition-colors">{quiz.title}</h4>
                       <div className="mt-2 flex items-center justify-between text-xs text-slate-500 flex-row-reverse">
                         <span>{quiz.duration} دقيقة</span>
                         <span>{new Date(quiz.startTime).toLocaleDateString("ar-EG")}</span>

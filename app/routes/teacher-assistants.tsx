@@ -75,7 +75,7 @@ export default function TeacherAssistants({ loaderData }: Route.ComponentProps) 
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm text-right focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  className="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm text-right focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none"
                   placeholder="اسم المساعد"
                 />
               </div>
@@ -86,7 +86,7 @@ export default function TeacherAssistants({ loaderData }: Route.ComponentProps) 
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm text-right focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  className="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm text-right focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none"
                   placeholder="البريد الإلكتروني لتسجيل الدخول"
                   dir="ltr"
                 />
@@ -98,7 +98,7 @@ export default function TeacherAssistants({ loaderData }: Route.ComponentProps) 
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm text-right focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  className="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm text-right focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none"
                   placeholder="كلمة مرور المساعد"
                   dir="ltr"
                 />
@@ -106,7 +106,7 @@ export default function TeacherAssistants({ loaderData }: Route.ComponentProps) 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors disabled:opacity-50"
+                className="w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl transition-colors disabled:opacity-50"
               >
                 {loading ? "جاري الإضافة..." : "إضافة حساب مساعد"}
               </button>
@@ -128,7 +128,7 @@ export default function TeacherAssistants({ loaderData }: Route.ComponentProps) 
                 {assistants.map((assistant: any) => (
                   <div key={assistant.id} className="p-6 flex items-center justify-between hover:bg-slate-50 transition-colors flex-row-reverse">
                     <div className="flex items-center gap-4 flex-row-reverse">
-                      <div className="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-lg">
+                      <div className="w-12 h-12 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center font-bold text-lg">
                         {assistant.name ? assistant.name[0].toUpperCase() : "A"}
                       </div>
                       <div className="text-right">
