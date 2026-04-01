@@ -58,7 +58,7 @@ export default function TeacherEditClass({ loaderData }: Route.ComponentProps) {
       </div>
 
       {error && (
-        <div className="bg-rose-50 border border-rose-200 text-rose-600 px-5 py-4 rounded-xl mb-6 text-sm font-medium">{error}</div>
+        <div className="bg-danger-50 border border-danger-200 text-danger-600 px-5 py-4 rounded-xl mb-6 text-sm font-medium">{error}</div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">

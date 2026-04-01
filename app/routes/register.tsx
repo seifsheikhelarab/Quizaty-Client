@@ -34,6 +34,7 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const roleHintId = "register-role-hint";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -105,7 +106,11 @@ export default function RegisterPage() {
         </div>
 
         {error && (
-          <div className="bg-danger-50 border border-danger-200 text-danger-700 px-5 py-4 rounded-xl mb-8 flex items-start text-right">
+          <div
+            className="bg-danger-50 border border-danger-200 text-danger-700 px-5 py-4 rounded-xl mb-8 flex items-start text-right"
+            role="alert"
+            aria-live="polite"
+          >
             <svg className="w-5 h-5 ml-3 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -114,10 +119,38 @@ export default function RegisterPage() {
         )}
 
         {/* Role Selector */}
-        <div className="mb-8 flex justify-center rounded-2xl border border-primary-100/70 bg-primary-50/60 p-1">
-          <button type="button" className={`${role === "student" ? activeBtn : inactiveBtn} cursor-pointer`} onClick={() => setRole("student")}>طالب</button>
-          <button type="button" className={`${role === "teacher" ? activeBtn : inactiveBtn} cursor-pointer`} onClick={() => setRole("teacher")}>معلم</button>
-        </div>
+        <fieldset className="mb-8">
+          <legend className="mb-2 text-sm font-bold text-slate-700">اختر نوع الحساب</legend>
+          <p id={roleHintId} className="mb-3 text-sm text-slate-500">
+            اختر ما إذا كنت تريد إنشاء حساب طالب أو معلم.
+          </p>
+          <div
+            className="flex justify-center rounded-2xl border border-primary-100/70 bg-primary-50/60 p-1"
+            role="radiogroup"
+            aria-describedby={roleHintId}
+          >
+            <button
+              type="button"
+              role="radio"
+              aria-checked={role === "student"}
+              aria-label="إنشاء حساب طالب"
+              className={`${role === "student" ? activeBtn : inactiveBtn} cursor-pointer`}
+              onClick={() => setRole("student")}
+            >
+              طالب
+            </button>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={role === "teacher"}
+              aria-label="إنشاء حساب معلم"
+              className={`${role === "teacher" ? activeBtn : inactiveBtn} cursor-pointer`}
+              onClick={() => setRole("teacher")}
+            >
+              معلم
+            </button>
+          </div>
+        </fieldset>
 
         <form onSubmit={handleSubmit} className="space-y-6 text-right">
           <div>

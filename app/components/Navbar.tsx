@@ -12,6 +12,9 @@ interface NavbarProps {
 export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const mobileMenuId = `mobile-nav-${role}`;
+  const displayName = userName?.trim() || (role === "teacher" ? "المعلم" : "الطالب");
+  const avatarLabel = displayName.charAt(0).toUpperCase();
 
   const isActive = (path: string) =>
     location.pathname.startsWith(path)
@@ -37,12 +40,16 @@ export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
       ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/70 bg-white/88 shadow-[0_10px_35px_-28px_color-mix(in_srgb,var(--color-primary-700)_35%,transparent)] backdrop-blur-xl opacity-0 animate-reveal-down">
+    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 shadow-[0_1px_0_rgba(15,23,42,0.05)] opacity-0 animate-reveal-down">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link to={role === "teacher" ? "/teacher/dashboard" : "/student/dashboard"} className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-primary-600 to-secondary-500 shadow-sm shadow-primary-200 transform -rotate-3">
-              <svg className="w-5 h-5 text-white rotate-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <Link
+            to={role === "teacher" ? "/teacher/dashboard" : "/student/dashboard"}
+            className="flex items-center gap-3"
+            aria-label="العودة إلى الصفحة الرئيسية"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
               </svg>
@@ -67,9 +74,14 @@ export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
           ) : (
             <>
               {/* Desktop Nav */}
-              <nav className="hidden md:flex items-center gap-6">
+              <nav className="hidden md:flex items-center gap-6" aria-label="التنقل الرئيسي">
                 {navLinks.map((link) => (
-                  <Link key={link.path} to={link.path} className={`text-sm font-bold transition-colors ${isActive(link.path)}`}>
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`text-sm font-bold transition-colors ${isActive(link.path)}`}
+                    aria-current={location.pathname.startsWith(link.path) ? "page" : undefined}
+                  >
                     {link.name}
                   </Link>
                 ))}
@@ -79,16 +91,17 @@ export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
               
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-primary-50 rounded-full flex items-center justify-center text-primary-600 font-bold border border-primary-100 text-xs">
-                  {userName ? userName.charAt(0).toUpperCase() : "م"}
+                  {avatarLabel}
                 </div>
                 <div className="hidden sm:block text-xs font-bold text-slate-700 max-w-[100px] truncate">
-                  {userName}
+                  {displayName}
                 </div>
               </div>
 
               <button
                 onClick={handleLogout}
-              className="hidden md:flex text-sm font-bold text-slate-500 hover:text-danger-600 transition-colors items-center gap-1.5 group cursor-pointer"
+                className="hidden md:flex text-sm font-bold text-slate-500 hover:text-danger-600 transition-colors items-center gap-1.5 group cursor-pointer"
+                aria-label="تسجيل الخروج"
               >
                 <span>الخروج</span>
                 <svg className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,8 +111,11 @@ export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
 
               {/* Mobile Menu Toggle */}
               <button 
-                className={`md:hidden p-2 text-slate-500 hover:text-slate-900 transition-all duration-300 transform ${isMobileMenuOpen ? 'rotate-90 scale-110' : ''}`}
+                className="md:hidden p-2 text-slate-500 hover:text-slate-900 transition-colors"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-expanded={isMobileMenuOpen}
+                aria-controls={mobileMenuId}
+                aria-label={isMobileMenuOpen ? "إغلاق قائمة التنقل" : "فتح قائمة التنقل"}
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {isMobileMenuOpen ? (
@@ -118,19 +134,24 @@ export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
       {isMobileMenuOpen && !backUrl && (
         <>
           <div 
-            className="fixed inset-0 bg-slate-900/12 backdrop-blur-sm z-30 md:hidden animate-in fade-in duration-300"
+            className="fixed inset-0 z-30 bg-slate-900/18 md:hidden animate-in fade-in duration-300"
             onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden="true"
           />
-          <div className="absolute top-16 left-0 right-0 z-40 overflow-hidden rounded-b-4xl border-b border-primary-100/70 bg-white/96 shadow-2xl shadow-slate-900/8 md:hidden animate-reveal-down">
-            <nav className="flex flex-col p-6 space-y-1">
+          <div
+            id={mobileMenuId}
+            className="absolute top-16 left-0 right-0 z-40 overflow-hidden border-b border-slate-200 bg-white shadow-[0_12px_24px_-20px_rgba(15,23,42,0.28)] md:hidden animate-reveal-down"
+          >
+            <nav className="flex flex-col p-6 space-y-1" aria-label="التنقل الرئيسي للجوال">
               {navLinks.map((link, i) => (
                 <Link 
                   key={link.path} 
                   to={link.path} 
-                  className={`py-4 px-5 rounded-2xl text-base font-black transition-all flex items-center justify-between opacity-0 animate-reveal-right ${
+                  className={`py-4 px-5 rounded-2xl text-base font-black transition-colors flex items-center justify-between opacity-0 animate-reveal-right ${
                     i === 0 ? "delay-100" : i === 1 ? "delay-150" : "delay-200"
                   } ${isActive(link.path)}`}
                   onClick={() => setIsMobileMenuOpen(false)}
+                  aria-current={location.pathname.startsWith(link.path) ? "page" : undefined}
                 >
                   <span>{link.name}</span>
                   <svg className="w-5 h-5 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,6 +165,7 @@ export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
               <button
                 onClick={handleLogout}
                 className="w-full text-right py-4 px-5 rounded-2xl text-base font-black text-danger-600 hover:bg-danger-50 transition-all flex items-center justify-between opacity-0 animate-reveal-right delay-300"
+                aria-label="تسجيل الخروج"
               >
                 <span>تسجيل الخروج</span>
                 <div className="w-10 h-10 bg-danger-50 rounded-xl flex items-center justify-center">
@@ -153,13 +175,13 @@ export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
                 </div>
               </button>
             </nav>
-            <div className="bg-linear-to-l from-primary-50/70 to-secondary-50/60 p-6 flex items-center justify-between opacity-0 animate-reveal-up delay-400">
+            <div className="border-t border-slate-100 bg-slate-50 p-6 flex items-center justify-between opacity-0 animate-reveal-up delay-400">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-linear-to-br from-primary-600 to-secondary-500 rounded-xl flex items-center justify-center text-white font-black text-lg shadow-lg shadow-primary-200">
-                  {userName ? userName.charAt(0).toUpperCase() : "م"}
+                <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white font-black text-lg">
+                  {avatarLabel}
                 </div>
                 <div>
-                  <div className="text-sm font-black text-slate-900">{userName}</div>
+                  <div className="text-sm font-black text-slate-900">{displayName}</div>
                   <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{role === "teacher" ? "معلم" : "طالب"}</div>
                 </div>
               </div>

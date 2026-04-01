@@ -81,7 +81,7 @@ export default function StudentQuizDetail({ loaderData }: Route.ComponentProps) 
           <div>
             <p className="text-sm text-slate-500 font-bold mb-1">الحالة</p>
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
-              isUpcoming ? "bg-amber-100 text-amber-800" : isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-800"
+              isUpcoming ? "bg-warning-100 text-warning-800" : isActive ? "bg-success-100 text-success-800" : "bg-slate-100 text-slate-800"
             }`}>
               {isUpcoming ? "قادم" : isActive ? "مفتوح" : "انتهى"}
             </span>
@@ -111,25 +111,25 @@ export default function StudentQuizDetail({ loaderData }: Route.ComponentProps) 
 
         <div className="pt-6 border-t border-slate-100">
           {hasSubmitted ? (
-            <div className="text-center p-6 bg-emerald-50 rounded-xl border border-emerald-100">
+            <div className="text-center p-6 bg-success-50 rounded-xl border border-success-100">
               <span className="text-3xl mb-2 block">✅</span>
-              <h3 className="text-lg font-bold text-emerald-900 mb-1">تم إكمال الاختبار</h3>
-              <p className="text-emerald-700 text-sm mb-4">لقد قمت بتسليم إجاباتك لهذا الاختبار.</p>
+              <h3 className="text-lg font-bold text-success-900 mb-1">تم إكمال الاختبار</h3>
+              <p className="text-success-700 text-sm mb-4">لقد قمت بتسليم إجاباتك لهذا الاختبار.</p>
               <Link to={`/student/quizzes/${quiz.id}/result`} className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-primary-600 hover:bg-primary-700 transition-colors">
                 عرض النتيجة
               </Link>
             </div>
           ) : isUpcoming ? (
-            <div className="text-center p-6 bg-amber-50 rounded-xl border border-amber-100">
+            <div className="text-center p-6 bg-warning-50 rounded-xl border border-warning-100">
               <span className="text-3xl mb-2 block">⏳</span>
-              <h3 className="text-lg font-bold text-amber-900 mb-1">الاختبار لم يبدأ بعد</h3>
-              <p className="text-amber-700 text-sm">يرجى العودة في الموعد المحدد للبدء.</p>
+              <h3 className="text-lg font-bold text-warning-900 mb-1">الاختبار لم يبدأ بعد</h3>
+              <p className="text-warning-700 text-sm">يرجى العودة في الموعد المحدد للبدء.</p>
             </div>
           ) : isEnded ? (
-            <div className="text-center p-6 bg-rose-50 rounded-xl border border-rose-100">
+            <div className="text-center p-6 bg-danger-50 rounded-xl border border-danger-100">
               <span className="text-3xl mb-2 block">🔒</span>
-              <h3 className="text-lg font-bold text-rose-900 mb-1">انتهى وقت الاختبار</h3>
-              <p className="text-rose-700 text-sm">لم يعد بإمكانك أداء هذا الاختبار.</p>
+              <h3 className="text-lg font-bold text-danger-900 mb-1">انتهى وقت الاختبار</h3>
+              <p className="text-danger-700 text-sm">لم يعد بإمكانك أداء هذا الاختبار.</p>
             </div>
           ) : (
             <div className="text-center p-6 bg-primary-50 rounded-xl border border-primary-100">

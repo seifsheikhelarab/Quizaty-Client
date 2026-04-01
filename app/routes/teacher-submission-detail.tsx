@@ -62,14 +62,14 @@ export default function TeacherSubmissionDetail({ loaderData }: Route.ComponentP
 
       {/* Anti-Cheat Violations */}
       {submission.violations && submission.violations.length > 0 && (
-        <div className="bg-rose-50 border border-rose-200 rounded-2xl p-6 mb-8">
-          <h3 className="text-lg font-bold text-rose-800 mb-4 flex items-center gap-2 flex-row-reverse">
+        <div className="bg-danger-50 border border-danger-200 rounded-2xl p-6 mb-8">
+          <h3 className="text-lg font-bold text-danger-800 mb-4 flex items-center gap-2 flex-row-reverse">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
             سجل مخالفات النظام (Anti-Cheat)
           </h3>
           <ul className="space-y-3">
             {submission.violations.map((v, idx) => (
-              <li key={idx} className="bg-white border border-rose-100 rounded-xl p-4 flex items-start justify-between flex-row-reverse shadow-sm">
+              <li key={idx} className="bg-white border border-danger-100 rounded-xl p-4 flex items-start justify-between flex-row-reverse shadow-sm">
                 <div>
                   <span className="font-bold text-slate-900 block mb-1">
                     {v.type === 'tab_switch' ? 'مغادرة صفحة الاختبار' : v.type}
@@ -91,11 +91,11 @@ export default function TeacherSubmissionDetail({ loaderData }: Route.ComponentP
           const studentAnswer = submission.answers?.[i] ?? -1;
           const isCorrect = studentAnswer === q.correctOption;
           return (
-            <div key={q.id} className={`bg-white rounded-2xl border p-6 ${isCorrect ? 'border-emerald-200' : 'border-rose-200'}`}>
+            <div key={q.id} className={`bg-white rounded-2xl border p-6 ${isCorrect ? 'border-success-200' : 'border-danger-200'}`}>
               <div className="flex items-start justify-between flex-row-reverse mb-4">
                 <div className="flex items-center gap-2 flex-row-reverse">
                   <span className="text-sm font-bold text-slate-500">سؤال {i + 1}</span>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${isCorrect ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${isCorrect ? 'bg-success-50 text-success-700' : 'bg-danger-50 text-danger-700'}`}>
                     {isCorrect ? "صحيح" : "خطأ"}
                   </span>
                 </div>
@@ -104,7 +104,11 @@ export default function TeacherSubmissionDetail({ loaderData }: Route.ComponentP
               <p className="font-bold text-slate-900 mb-4">{q.questionText}</p>
 
               {q.imageUrl && (
-                <img src={q.imageUrl} alt="سؤال" className="max-w-sm rounded-xl mb-4 border border-slate-200" />
+                <img
+                  src={q.imageUrl}
+                  alt={`صورة مرفقة بالسؤال رقم ${i + 1}: ${q.questionText}`}
+                  className="max-w-sm rounded-xl mb-4 border border-slate-200"
+                />
               )}
 
               <div className="space-y-2">
@@ -112,8 +116,8 @@ export default function TeacherSubmissionDetail({ loaderData }: Route.ComponentP
                   const isStudentChoice = optIdx === studentAnswer;
                   const isCorrectOption = optIdx === q.correctOption;
                   let bgClass = "bg-slate-50 border-slate-200 text-slate-700";
-                  if (isCorrectOption) bgClass = "bg-emerald-50 border-emerald-300 text-emerald-800";
-                  else if (isStudentChoice && !isCorrect) bgClass = "bg-rose-50 border-rose-300 text-rose-800";
+                  if (isCorrectOption) bgClass = "bg-success-50 border-success-300 text-success-800";
+                  else if (isStudentChoice && !isCorrect) bgClass = "bg-danger-50 border-danger-300 text-danger-800";
 
                   return (
                     <div key={optIdx} className={`px-4 py-3 rounded-xl border text-sm font-medium flex items-center justify-between flex-row-reverse ${bgClass}`}>

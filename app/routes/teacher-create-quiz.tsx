@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { apiFetch } from "../utils/api";
+import { FeedbackBanner } from "../components/FeedbackBanner";
 import type { Route } from "./+types/teacher-create-quiz";
 
 export function meta() {
@@ -35,14 +36,16 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
   const [showBankModal, setShowBankModal] = useState(false);
   const [bankQuestions, setBankQuestions] = useState<any[]>([]);
   const [loadingBank, setLoadingBank] = useState(false);
+  const [feedback, setFeedback] = useState<{ tone: "error" | "success" | "info"; message: string } | null>(null);
 
   const fetchBankQuestions = async () => {
     setLoadingBank(true);
+    setFeedback(null);
     try {
       const data = await apiFetch("/teacher/question-bank");
       setBankQuestions(data.questions);
     } catch (err: any) {
-      alert(err.message || "فشل تحميل بنك الأسئلة");
+      setFeedback({ tone: "error", message: err.message || "فشل تحميل بنك الأسئلة" });
     } finally {
       setLoadingBank(false);
     }
@@ -62,17 +65,18 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
 
   const saveToBank = async (q: QuestionForm) => {
     if (!q.text || q.options.some((o) => !o.trim())) {
-      alert("الرجاء إكمال السؤال وخياراته أولاً");
+      setFeedback({ tone: "error", message: "الرجاء إكمال السؤال وخياراته أولاً." });
       return;
     }
+    setFeedback(null);
     try {
       await apiFetch("/teacher/question-bank", {
         method: "POST",
         body: JSON.stringify({ questionText: q.text, options: q.options, correctOption: q.correctOption }),
       });
-      alert("تم حفظ السؤال في بنك الأسئلة بنجاح!");
+      setFeedback({ tone: "success", message: "تم حفظ السؤال في بنك الأسئلة بنجاح." });
     } catch (err: any) {
-      alert(err.message || "فشل حفظ السؤال");
+      setFeedback({ tone: "error", message: err.message || "فشل حفظ السؤال" });
     }
   };
 
@@ -106,6 +110,7 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    setFeedback(null);
     setLoading(true);
     const form = new FormData(e.currentTarget);
     try {
@@ -145,8 +150,16 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
         <p className="text-slate-500 mt-2 text-lg">أنشئ اختبارًا وأضف الأسئلة.</p>
       </div>
 
+      {feedback && (
+        <FeedbackBanner
+          tone={feedback.tone}
+          message={feedback.message}
+          className="mb-6"
+        />
+      )}
+
       {error && (
-        <div className="bg-rose-50 border border-rose-200 text-rose-600 px-5 py-4 rounded-xl mb-6 text-sm font-medium">{error}</div>
+        <div className="bg-danger-50 border border-danger-200 text-danger-600 px-5 py-4 rounded-xl mb-6 text-sm font-medium">{error}</div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -210,7 +223,7 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
             <h3 className="text-lg font-bold text-slate-900">الأسئلة ({questions.length})</h3>
             <div className="flex items-center gap-3">
               {limits?.questionBank && (
-                <button type="button" onClick={openBankModal} className="inline-flex items-center px-4 py-2 text-sm font-bold rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors cursor-pointer border border-emerald-200">
+                <button type="button" onClick={openBankModal} className="inline-flex items-center px-4 py-2 text-sm font-bold rounded-lg text-success-700 bg-success-50 hover:bg-success-100 transition-colors cursor-pointer border border-success-200">
                   <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                   استيراد من بنك الأسئلة
                 </button>
@@ -230,12 +243,12 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
                 <span className="text-sm font-bold text-slate-500">سؤال {qi + 1}</span>
                 <div className="flex items-center gap-3">
                   {limits?.questionBank && (
-                    <button type="button" onClick={() => saveToBank(q)} className="text-emerald-600 hover:text-emerald-800 text-xs font-bold cursor-pointer transition-colors">
+                    <button type="button" onClick={() => saveToBank(q)} className="text-success-600 hover:text-success-800 text-xs font-bold cursor-pointer transition-colors">
                       حفظ في بنك الأسئلة
                     </button>
                   )}
                   {questions.length > 1 && (
-                    <button type="button" onClick={() => removeQuestion(qi)} className="text-rose-500 hover:text-rose-700 text-xs font-bold cursor-pointer transition-colors">حذف</button>
+                    <button type="button" onClick={() => removeQuestion(qi)} className="text-danger-500 hover:text-danger-700 text-xs font-bold cursor-pointer transition-colors">حذف</button>
                   )}
                 </div>
               </div>
@@ -284,10 +297,10 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
                               if (data.imageUrl) {
                                 updateQuestion(qi, "imageUrl", data.imageUrl);
                               } else if (data.error) {
-                                alert(data.error);
+                                setFeedback({ tone: "error", message: data.error });
                               }
                             } catch (err) {
-                              alert("فشل رفع الصورة");
+                              setFeedback({ tone: "error", message: "فشل رفع الصورة" });
                             }
                           }}
                         />
@@ -298,7 +311,7 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
                           <button
                             type="button"
                             onClick={() => updateQuestion(qi, "imageUrl", null)}
-                            className="text-rose-500 hover:text-rose-700 text-xs font-bold"
+                            className="text-danger-500 hover:text-danger-700 text-xs font-bold"
                           >
                             حذف
                           </button>
@@ -326,7 +339,7 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
                         placeholder={`الخيار ${oi + 1}`}
                       />
                       {q.correctOption === oi && (
-                        <span className="text-xs font-bold text-emerald-600">✓ صحيح</span>
+                        <span className="text-xs font-bold text-success-600">✓ صحيح</span>
                       )}
                     </div>
                   ))}
@@ -376,7 +389,7 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
                       <p className="font-bold text-sm text-slate-900 mb-3">{bq.questionText}</p>
                       <ul className="grid grid-cols-2 gap-2 mb-4">
                         {bq.options.map((opt: string, i: number) => (
-                          <li key={i} className={`text-xs p-2 rounded-lg border text-right ${i === bq.correctOption ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-slate-50 border-slate-100 text-slate-600'}`}>
+                          <li key={i} className={`text-xs p-2 rounded-lg border text-right ${i === bq.correctOption ? 'bg-success-50 border-success-200 text-success-800' : 'bg-slate-50 border-slate-100 text-slate-600'}`}>
                             {opt} {i === bq.correctOption && '✓'}
                           </li>
                         ))}

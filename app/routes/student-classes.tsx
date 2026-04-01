@@ -18,6 +18,7 @@ export default function StudentClasses({ loaderData }: Route.ComponentProps) {
   };
   const classes = data?.classes || [];
   const [search, setSearch] = useState("");
+  const searchId = "student-classes-search";
 
   const filteredClasses = classes.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -32,17 +33,30 @@ export default function StudentClasses({ loaderData }: Route.ComponentProps) {
       </div>
 
       {/* Search */}
-      <div className="mb-6 relative max-w-md">
+      <div className="mb-6 max-w-md">
+        <label htmlFor={searchId} className="mb-2 block text-sm font-bold text-slate-700">
+          ابحث في الفصول
+        </label>
+        <p className="mb-3 text-sm text-slate-500">
+          ابحث باسم الفصل أو باسم المعلم للوصول إلى الفصل المطلوب بسرعة.
+        </p>
+        <div className="relative">
         <svg className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <input
+          id={searchId}
           type="text"
           placeholder="ابحث باسم الفصل أو المعلم..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          aria-describedby={`${searchId}-hint`}
           className="w-full pr-10 pl-4 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
         />
+        </div>
+        <span id={`${searchId}-hint`} className="sr-only">
+          يمكنك كتابة اسم الفصل أو اسم المعلم لتصفية النتائج.
+        </span>
       </div>
 
       {filteredClasses.length === 0 ? (
@@ -56,7 +70,7 @@ export default function StudentClasses({ loaderData }: Route.ComponentProps) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredClasses.map((c) => (
-            <Link key={c.id} to={`/student/classes/${c.id}`} className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col hover:shadow-md hover:border-emerald-300 transition-all">
+            <Link key={c.id} to={`/student/classes/${c.id}`} className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col hover:shadow-md hover:border-success-300 transition-all">
               <h3 className="text-xl font-bold text-slate-900 mb-1">{c.name}</h3>
               {c.description && <p className="text-sm text-slate-500 mb-4 line-clamp-2">{c.description}</p>}
               <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between text-sm flex-row-reverse">

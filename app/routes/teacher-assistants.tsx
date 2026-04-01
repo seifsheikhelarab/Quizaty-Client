@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { apiFetch } from "../utils/api";
+import { ConfirmDialog } from "../components/ConfirmDialog";
+import { FeedbackBanner } from "../components/FeedbackBanner";
 import type { Route } from "./+types/teacher-assistants";
 
 export function meta() {
@@ -19,11 +21,15 @@ export default function TeacherAssistants({ loaderData }: Route.ComponentProps) 
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [assistantToRemove, setAssistantToRemove] = useState<{ id: string; name: string } | null>(null);
+  const [isRemovingAssistant, setIsRemovingAssistant] = useState(false);
 
   const handleAddAssistant = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setStatusMessage(null);
     try {
       await apiFetch("/teacher/assistants", {
         method: "POST",
@@ -36,20 +42,23 @@ export default function TeacherAssistants({ loaderData }: Route.ComponentProps) 
     }
   };
 
-  const handleRemoveAssistant = async (id: string) => {
-    if (!confirm("هل أنت متأكد من حذف حساب المساعد؟ لن يتمكن من تسجيل الدخول بعد الآن.")) return;
+  const handleRemoveAssistant = async () => {
+    if (!assistantToRemove) return;
+    setIsRemovingAssistant(true);
+    setStatusMessage(null);
     try {
-      await apiFetch(`/teacher/assistants/${id}`, { method: "DELETE" });
+      await apiFetch(`/teacher/assistants/${assistantToRemove.id}`, { method: "DELETE" });
       window.location.reload();
     } catch (err: any) {
-      alert(err.message || "حدث خطأ أثناء حذف المساعد");
+      setStatusMessage(err.message || "حدث خطأ أثناء حذف المساعد");
+      setIsRemovingAssistant(false);
     }
   };
 
   if (user.isAssistant) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-black text-rose-600 mb-4">عذراً، لا تمتلك صلاحية للوصول إلى هذه الصفحة</h2>
+        <h2 className="text-2xl font-black text-danger-600 mb-4">عذراً، لا تمتلك صلاحية للوصول إلى هذه الصفحة</h2>
         <p className="text-slate-600">يمكن للمدرس الأساسي فقط إدارة حسابات المساعدين.</p>
       </div>
     );
@@ -61,12 +70,19 @@ export default function TeacherAssistants({ loaderData }: Route.ComponentProps) 
         <h2 className="text-3xl font-black text-slate-900 tracking-tight">إدارة المساعدين</h2>
         <p className="text-slate-500 mt-2 text-sm">أضف مساعدين لمساعدتك في إدارة المنصة، الفصول، والاختبارات.</p>
       </div>
+      {statusMessage && (
+        <FeedbackBanner
+          tone="error"
+          message={statusMessage}
+          className="mb-6"
+        />
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
             <h3 className="text-lg font-bold text-slate-900 mb-4">إضافة مساعد جديد</h3>
-            {error && <div className="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-sm rounded-lg">{error}</div>}
+            {error && <div className="mb-4 p-3 bg-danger-50 border border-danger-200 text-danger-700 text-sm rounded-lg">{error}</div>}
             <form onSubmit={handleAddAssistant} className="space-y-4">
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-1">الاسم</label>
@@ -137,8 +153,8 @@ export default function TeacherAssistants({ loaderData }: Route.ComponentProps) 
                       </div>
                     </div>
                     <button
-                      onClick={() => handleRemoveAssistant(assistant.id)}
-                      className="px-3 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 rounded-lg transition-colors cursor-pointer"
+                      onClick={() => setAssistantToRemove({ id: assistant.id, name: assistant.name })}
+                      className="px-3 py-1.5 text-xs font-bold text-danger-600 hover:bg-danger-50 border border-slate-200 hover:border-danger-200 rounded-lg transition-colors cursor-pointer"
                     >
                       حذف الحساب
                     </button>
@@ -149,6 +165,21 @@ export default function TeacherAssistants({ loaderData }: Route.ComponentProps) 
           </div>
         </div>
       </div>
+      <ConfirmDialog
+        open={assistantToRemove !== null}
+        title="حذف حساب المساعد"
+        description={
+          assistantToRemove
+            ? `سيتم حذف حساب المساعد "${assistantToRemove.name}" ولن يتمكن من تسجيل الدخول بعد الآن.`
+            : ""
+        }
+        confirmLabel="حذف الحساب"
+        busy={isRemovingAssistant}
+        onCancel={() => {
+          if (!isRemovingAssistant) setAssistantToRemove(null);
+        }}
+        onConfirm={handleRemoveAssistant}
+      />
     </div>
   );
 }

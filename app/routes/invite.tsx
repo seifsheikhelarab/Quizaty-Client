@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { apiFetch } from "../utils/api";
+import { FeedbackBanner } from "../components/FeedbackBanner";
 
 export function meta() {
   return [{ title: "الانضمام إلى الفصل | Quizaty" }];
@@ -9,6 +10,8 @@ export function meta() {
 export default function InvitePage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [statusMessage, setStatusMessage] = useState("جاري معالجة الدعوة...");
+  const [statusTone, setStatusTone] = useState<"info" | "error">("info");
 
   useEffect(() => {
     const processInvite = async () => {
@@ -19,23 +22,28 @@ export default function InvitePage() {
         if (authData && authData.user && authData.user.role === "student") {
           // User is logged in as a student, join class directly
           try {
+             setStatusMessage("جارٍ الانضمام إلى الفصل...");
              await apiFetch(`/classes/${id}/join`, { method: "POST" });
-             navigate("/student/classes");
+             setStatusMessage("تم الانضمام إلى الفصل بنجاح. سيتم تحويلك الآن.");
+             window.setTimeout(() => navigate("/student/classes"), 900);
           } catch (err: any) {
              console.error("Failed to join class:", err.message);
-             alert(err.message || "حدث خطأ أثناء الانضمام للفصل");
-             navigate("/student/dashboard");
+             setStatusTone("error");
+             setStatusMessage(err.message || "حدث خطأ أثناء الانضمام للفصل");
+             window.setTimeout(() => navigate("/student/dashboard"), 1400);
           }
         } else if (authData && authData.user && authData.user.role === "teacher") {
              // Let teacher know they cannot join classes
-             alert("المعلمون لا يمكنهم الانضمام كطلاب للفصول");
-             navigate("/teacher/dashboard");
+             setStatusTone("error");
+             setStatusMessage("المعلمون لا يمكنهم الانضمام إلى الفصول بصفة طالب.");
+             window.setTimeout(() => navigate("/teacher/dashboard"), 1400);
         } else {
              // User is not logged in
              // Store the classId in sessionStorage so we can pick it up after login/register
              sessionStorage.setItem("inviteClassId", id || "");
              // Redirect to register with a nice message or param if needed
-             navigate("/register");
+             setStatusMessage("سيتم تحويلك إلى صفحة التسجيل لإكمال الانضمام.");
+             window.setTimeout(() => navigate("/register"), 900);
         }
 
       } catch (err) {
@@ -55,6 +63,11 @@ export default function InvitePage() {
         </div>
         <h2 className="text-2xl font-bold text-slate-800 tracking-tight">جاري معالجة الدعوة...</h2>
         <p className="text-slate-500 mt-2 text-sm text-center">يرجى الانتظار بينما نقوم بإعداد الفصل لك.</p>
+        <FeedbackBanner
+          tone={statusTone}
+          message={statusMessage}
+          className="mt-6 w-full max-w-md text-center"
+        />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router";
 import { apiFetch, API_BASE } from "../utils/api";
+import { FeedbackBanner } from "../components/FeedbackBanner";
 import type { Route } from "./+types/teacher-ocr-upload";
 
 export function meta() {
@@ -30,6 +31,7 @@ export default function TeacherOcrUpload({ loaderData }: Route.ComponentProps) {
   const [extractedQuestions, setExtractedQuestions] = useState<ExtractedQuestion[] | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -82,6 +84,7 @@ export default function TeacherOcrUpload({ loaderData }: Route.ComponentProps) {
       } else {
         setExtractedQuestions(data.questions);
       }
+      setSaveError(null);
       if (data.errors) {
         setErrors(data.errors);
       }
@@ -95,6 +98,7 @@ export default function TeacherOcrUpload({ loaderData }: Route.ComponentProps) {
   const handleSave = async () => {
     if (!extractedQuestions || extractedQuestions.length === 0) return;
     setSaving(true);
+    setSaveError(null);
 
     try {
       const response = await fetch(`${API_BASE}/teacher/ocr/save`, {
@@ -114,7 +118,7 @@ export default function TeacherOcrUpload({ loaderData }: Route.ComponentProps) {
 
       navigate("/teacher/question-bank");
     } catch (err: any) {
-      alert(err.message || "حدث خطأ أثناء الحفظ");
+      setSaveError(err.message || "حدث خطأ أثناء الحفظ");
     } finally {
       setSaving(false);
     }
@@ -125,11 +129,19 @@ export default function TeacherOcrUpload({ loaderData }: Route.ComponentProps) {
     setPreview(null);
     setExtractedQuestions(null);
     setErrors([]);
+    setSaveError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   return (
     <div className="max-w-3xl mx-auto text-right">
+      {saveError && (
+        <FeedbackBanner
+          tone="error"
+          message={saveError}
+          className="mb-6"
+        />
+      )}
       <div className="mb-8 pb-6 border-b border-slate-200">
         <Link
           to="/teacher/question-bank"
@@ -200,7 +212,7 @@ export default function TeacherOcrUpload({ loaderData }: Route.ComponentProps) {
             type="button"
             onClick={handleExtract}
             disabled={!selectedFile || loading}
-            className="w-full inline-flex items-center justify-center px-6 py-4 border border-transparent text-sm font-black rounded-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none shadow-lg shadow-green-100 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full inline-flex items-center justify-center px-6 py-4 border border-transparent text-sm font-black rounded-xl text-white bg-success-600 hover:bg-success-700 focus:outline-none shadow-lg shadow-success-100 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {loading ? (
               <>
@@ -220,9 +232,9 @@ export default function TeacherOcrUpload({ loaderData }: Route.ComponentProps) {
             )}
           </button>
 
-          <div className="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100">
-            <h4 className="font-bold text-blue-800 mb-2">نصائح للحصول على أفضل النتائج:</h4>
-            <ul className="text-sm text-blue-700 space-y-1">
+          <div className="mt-8 p-4 bg-secondary-50 rounded-xl border border-secondary-100">
+            <h4 className="font-bold text-secondary-800 mb-2">نصائح للحصول على أفضل النتائج:</h4>
+            <ul className="text-sm text-secondary-700 space-y-1">
               <li>• تأكد من أن الصورة واضحة ومشرقة</li>
               <li>• تأكد من وجود 4 خيارات (أ، ب، ج، د) لكل سؤال</li>
               <li>• أفضل النتائج تكون مع الأسئلة المطبوعة</li>
@@ -232,12 +244,12 @@ export default function TeacherOcrUpload({ loaderData }: Route.ComponentProps) {
         </div>
       ) : (
         <div>
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-6 mb-8">
+          <div className="bg-success-50 border border-success-200 rounded-2xl p-6 mb-8">
             <div className="flex items-center">
-              <svg className="w-6 h-6 text-green-500 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-success-500 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              <span className="text-green-800 font-bold">تم استخراج {extractedQuestions.length} سؤال بنجاح!</span>
+              <span className="text-success-800 font-bold">تم استخراج {extractedQuestions.length} سؤال بنجاح!</span>
             </div>
           </div>
 
@@ -256,21 +268,21 @@ export default function TeacherOcrUpload({ loaderData }: Route.ComponentProps) {
                     <div
                       key={optIdx}
                       className={`flex items-center p-3 rounded-xl ${
-                        optIdx === q.correctOption ? "bg-green-50 border border-green-200" : "bg-slate-50 border border-slate-200"
+                        optIdx === q.correctOption ? "bg-success-50 border border-success-200" : "bg-slate-50 border border-slate-200"
                       }`}
                     >
                       <span
                         className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-bold ml-3 ${
-                          optIdx === q.correctOption ? "bg-green-500 text-white" : "bg-slate-200 text-slate-600"
+                          optIdx === q.correctOption ? "bg-success-500 text-white" : "bg-slate-200 text-slate-600"
                         }`}
                       >
                         {label}
                       </span>
-                      <span className={optIdx === q.correctOption ? "text-green-700 font-semibold" : "text-slate-700"}>
+                      <span className={optIdx === q.correctOption ? "text-success-700 font-semibold" : "text-slate-700"}>
                         {q.options[optIdx]}
                       </span>
                       {optIdx === q.correctOption && (
-                        <span className="mr-auto text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded">الإجابة الصحيحة</span>
+                        <span className="mr-auto text-xs font-bold text-success-600 bg-success-100 px-2 py-1 rounded">الإجابة الصحيحة</span>
                       )}
                     </div>
                   ))}
@@ -283,7 +295,7 @@ export default function TeacherOcrUpload({ loaderData }: Route.ComponentProps) {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex-1 inline-flex items-center justify-center px-6 py-4 border border-transparent text-sm font-black rounded-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none shadow-lg shadow-green-100 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 cursor-pointer"
+              className="flex-1 inline-flex items-center justify-center px-6 py-4 border border-transparent text-sm font-black rounded-xl text-white bg-success-600 hover:bg-success-700 focus:outline-none shadow-lg shadow-success-100 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 cursor-pointer"
             >
               {saving ? "جاري الحفظ..." : "حفظ الأسئلة في البنك"}
             </button>

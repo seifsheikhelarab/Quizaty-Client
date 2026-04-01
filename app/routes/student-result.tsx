@@ -26,7 +26,7 @@ export default function StudentResult({ loaderData }: Route.ComponentProps) {
     : "غير متوفر";
   
   const isPassed = submission.score >= quiz.totalMarks / 2;
-  const scoreColor = isPassed ? "text-emerald-600" : "text-rose-600";
+  const scoreColor = isPassed ? "text-success-600" : "text-danger-600";
   let answers: Record<string, string> = {};
   if (submission.answers) {
     answers = typeof submission.answers === "string" ? JSON.parse(submission.answers) : submission.answers;
@@ -60,9 +60,9 @@ export default function StudentResult({ loaderData }: Route.ComponentProps) {
               </div>
             </>
           ) : (
-            <div className="flex items-center bg-amber-50 px-4 py-2 rounded-xl border border-amber-100 shadow-sm flex-row-reverse opacity-0 animate-reveal-up delay-100">
-              <span className="text-xs uppercase text-amber-500 mr-2">الحالة</span>
-              <span className="text-amber-700 font-bold mr-2">بانتظار إصدار النتيجة</span>
+            <div className="flex items-center bg-warning-50 px-4 py-2 rounded-xl border border-warning-100 shadow-sm flex-row-reverse opacity-0 animate-reveal-up delay-100">
+              <span className="text-xs uppercase text-warning-500 mr-2">الحالة</span>
+              <span className="text-warning-700 font-bold mr-2">بانتظار إصدار النتيجة</span>
             </div>
           )}
           <div className="flex items-center bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm flex-row-reverse opacity-0 animate-reveal-up delay-300">
@@ -87,7 +87,7 @@ export default function StudentResult({ loaderData }: Route.ComponentProps) {
                 let badgeColor = "bg-slate-100 text-slate-600 font-bold";
                 let badgeText = "تم التخطي";
                 if (studentAnswer !== -1) {
-                  badgeColor = isCorrect ? "bg-emerald-100 text-emerald-800 font-bold" : "bg-rose-100 text-rose-800 font-bold";
+                  badgeColor = isCorrect ? "bg-success-100 text-success-800 font-bold" : "bg-danger-100 text-danger-800 font-bold";
                   badgeText = isCorrect ? "صحيحة" : "خاطئة";
                 }
 
@@ -98,7 +98,7 @@ export default function StudentResult({ loaderData }: Route.ComponentProps) {
                       index === 0 ? "delay-500" : index === 1 ? "delay-600" : "delay-700"
                     }`}
                   >
-                    <div className={`absolute top-0 right-0 w-1.5 h-full ${isCorrect ? 'bg-emerald-500' : (studentAnswer !== -1 ? 'bg-rose-500' : 'bg-slate-300')}`}></div>
+                    <div className={`absolute top-0 right-0 w-1.5 h-full ${isCorrect ? 'bg-success-500' : (studentAnswer !== -1 ? 'bg-danger-500' : 'bg-slate-300')}`}></div>
                     <div className="pr-3">
                       <div className="flex justify-between items-start mb-6 flex-row-reverse">
                         <h4 className="text-lg font-black text-slate-900 leading-snug pl-4 text-right flex-1">
@@ -116,13 +116,13 @@ export default function StudentResult({ loaderData }: Route.ComponentProps) {
                           let optClass = "border-slate-100 text-slate-600 bg-white opacity-80";
                           let label = "";
                           if (isSelected && isActualCorrect) {
-                            optClass = "border-emerald-500 bg-emerald-50 text-emerald-900 font-black shadow-sm ring-1 ring-emerald-500 opacity-100";
+                            optClass = "border-success-500 bg-success-50 text-success-900 font-black shadow-sm ring-1 ring-success-500 opacity-100";
                             label = "إجابتك ✓ صحيحة";
                           } else if (isSelected && !isActualCorrect) {
-                            optClass = "border-rose-300 bg-rose-50 text-rose-900 font-black shadow-sm ring-1 ring-rose-300 opacity-100";
+                            optClass = "border-danger-300 bg-danger-50 text-danger-900 font-black shadow-sm ring-1 ring-danger-300 opacity-100";
                             label = "إجابتك ✗";
                           } else if (isActualCorrect) {
-                            optClass = "border-emerald-200 bg-emerald-50/50 text-emerald-700 border-dashed opacity-100";
+                            optClass = "border-success-200 bg-success-50/50 text-success-700 border-dashed opacity-100";
                             label = "الإجابة الصحيحة";
                           }
 
@@ -142,8 +142,8 @@ export default function StudentResult({ loaderData }: Route.ComponentProps) {
           </div>
         ) : (
           <div className="py-12">
-            <div className="w-20 h-20 bg-amber-100 rounded-3xl flex items-center justify-center mx-auto mb-6 transform -rotate-6 animate-float">
-              <svg className="w-10 h-10 text-amber-600 rotate-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div className="w-20 h-20 bg-warning-100 rounded-3xl flex items-center justify-center mx-auto mb-6 transform -rotate-6 animate-float">
+              <svg className="w-10 h-10 text-warning-600 rotate-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </div>
             <h3 className="text-2xl font-black text-slate-900 mb-3">النتائج لم تصدر بعد</h3>
             <p className="text-slate-500 max-w-sm mx-auto leading-relaxed">

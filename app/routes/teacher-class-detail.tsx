@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router";
 import { apiFetch } from "../utils/api";
+import { ConfirmDialog } from "../components/ConfirmDialog";
+import { FeedbackBanner } from "../components/FeedbackBanner";
 import type { Route } from "./+types/teacher-class-detail";
 
 export function meta() {
@@ -34,6 +36,11 @@ interface ClassData {
   quizzes: Quiz[];
 }
 
+type ConfirmAction =
+  | { type: "remove-student"; student: Student }
+  | { type: "delete-class" }
+  | null;
+
 export default function TeacherClassDetail({ loaderData }: Route.ComponentProps) {
   const { classData, limits } = loaderData as { classData: ClassData; limits: any };
   
@@ -49,6 +56,9 @@ export default function TeacherClassDetail({ loaderData }: Route.ComponentProps)
   const [studentPhone, setStudentPhone] = useState("");
   const [adding, setAdding] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
+  const [isProcessingAction, setIsProcessingAction] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
 
   const handleCopyInvite = () => {
     const inviteLink = `${window.location.origin}/invite/${classData.id}`;
@@ -61,6 +71,7 @@ export default function TeacherClassDetail({ loaderData }: Route.ComponentProps)
   const handleAddStudent = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setAdding(true);
+    setFeedbackMessage(null);
     try {
       await apiFetch(`/teacher/classes/${classData.id}/students`, {
         method: "POST",
@@ -68,30 +79,39 @@ export default function TeacherClassDetail({ loaderData }: Route.ComponentProps)
       });
       window.location.reload();
     } catch (err: any) {
-      alert(err.message);
+      setFeedbackMessage(err.message || "تعذر إضافة الطالب حالياً.");
     } finally {
       setAdding(false);
     }
   };
 
-  const handleRemoveStudent = async (studentId: string) => {
-    if (!confirm("هل أنت متأكد من إزالة الطالب من الفصل؟")) return;
-    await apiFetch(`/teacher/classes/${classData.id}/students/${studentId}`, { method: "DELETE" });
-    window.location.reload();
-  };
+  const handleConfirmAction = async () => {
+    if (!confirmAction) return;
+    setIsProcessingAction(true);
 
-  const handleDeleteClass = async () => {
-    if (!confirm("هل أنت متأكد من حذف هذا الفصل نهائياً؟")) return;
+    if (confirmAction.type === "remove-student") {
+      await apiFetch(`/teacher/classes/${classData.id}/students/${confirmAction.student.id}`, { method: "DELETE" });
+      window.location.reload();
+      return;
+    }
+
     await apiFetch(`/teacher/classes/${classData.id}`, { method: "DELETE" });
     window.location.href = "/teacher/classes";
   };
 
   return (
     <div className="text-right">
+      {feedbackMessage && (
+        <FeedbackBanner
+          tone="error"
+          message={feedbackMessage}
+          className="mb-6"
+        />
+      )}
       {/* Header */}
       <div className="flex flex-col md:flex-row-reverse md:items-end justify-between mb-8 pb-6 border-b border-slate-200 gap-4">
         <div>
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 mb-2">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-success-100 text-success-800 mb-2">
             فصل دراسي
           </span>
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">{classData.name}</h2>
@@ -111,8 +131,8 @@ export default function TeacherClassDetail({ loaderData }: Route.ComponentProps)
             تعديل الفصل
           </Link>
           <button
-            onClick={handleDeleteClass}
-            className="inline-flex items-center justify-center px-4 py-2 border border-slate-300 text-sm font-bold rounded-lg text-rose-600 bg-white hover:bg-rose-50 hover:border-rose-200 transition-colors cursor-pointer"
+            onClick={() => setConfirmAction({ type: "delete-class" })}
+            className="inline-flex items-center justify-center px-4 py-2 border border-slate-300 text-sm font-bold rounded-lg text-danger-600 bg-white hover:bg-danger-50 hover:border-danger-200 transition-colors cursor-pointer"
           >
             حذف الفصل
           </button>
@@ -187,7 +207,7 @@ export default function TeacherClassDetail({ loaderData }: Route.ComponentProps)
                             href={`https://wa.me/${student.phone.startsWith('0') ? '2' + student.phone : student.phone}?text=${encodeURIComponent(`مرحباً بك في فصل "${classData.name}".${student.shortCode ? ` كود الدخول الخاص بك هو: ${student.shortCode}` : ''}`)}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-emerald-500 hover:text-emerald-700 transition-colors p-1"
+                            className="text-success-500 hover:text-success-700 transition-colors p-1"
                             title="مراسلة عبر واتساب"
                           >
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -197,8 +217,9 @@ export default function TeacherClassDetail({ loaderData }: Route.ComponentProps)
                         )}
                         <Link to={`/teacher/students/${student.id}`} className="text-primary-600 hover:text-primary-800 text-sm font-bold transition-colors">عرض</Link>
                         <button
-                          onClick={() => handleRemoveStudent(student.id)}
-                          className="text-slate-400 hover:text-rose-600 transition-colors p-1 cursor-pointer"
+                          onClick={() => setConfirmAction({ type: "remove-student", student })}
+                          className="text-slate-400 hover:text-danger-600 transition-colors p-1 cursor-pointer"
+                          aria-label={`إزالة الطالب ${student.name} من الفصل`}
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -245,6 +266,23 @@ export default function TeacherClassDetail({ loaderData }: Route.ComponentProps)
           </div>
         </div>
       </div>
+      <ConfirmDialog
+        open={confirmAction !== null}
+        title={confirmAction?.type === "delete-class" ? "حذف الفصل" : "إزالة الطالب من الفصل"}
+        description={
+          confirmAction?.type === "delete-class"
+            ? `سيتم حذف الفصل "${classData.name}" نهائياً من حسابك. لا يمكن التراجع عن هذا الإجراء.`
+            : confirmAction?.type === "remove-student"
+              ? `سيتم إزالة الطالب "${confirmAction.student.name}" من هذا الفصل مع الاحتفاظ بحسابه.`
+              : ""
+        }
+        confirmLabel={confirmAction?.type === "delete-class" ? "حذف الفصل" : "إزالة الطالب"}
+        busy={isProcessingAction}
+        onCancel={() => {
+          if (!isProcessingAction) setConfirmAction(null);
+        }}
+        onConfirm={handleConfirmAction}
+      />
     </div>
   );
 }

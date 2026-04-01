@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { apiFetch } from "../utils/api";
+import { ConfirmDialog } from "../components/ConfirmDialog";
+import { FeedbackBanner } from "../components/FeedbackBanner";
 import type { Route } from "./+types/teacher-question-bank";
 
 export function meta() {
@@ -36,8 +38,11 @@ export default function TeacherQuestionBank({ loaderData }: Route.ComponentProps
   const navigate = useNavigate();
   const [questionsList, setQuestionsList] = useState(questions);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [questionToDelete, setQuestionToDelete] = useState<BankQuestion | null>(null);
   const [search, setSearch] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [feedback, setFeedback] = useState<{ tone: "error" | "success"; message: string } | null>(null);
+  const searchId = "question-bank-search";
 
   const filteredQuestions = questionsList.filter((q) =>
     q.questionText.toLowerCase().includes(search.toLowerCase()) ||
@@ -46,14 +51,16 @@ export default function TeacherQuestionBank({ loaderData }: Route.ComponentProps
 
   const canAddQuestion = limits?.questionBank === true;
 
-  const deleteQuestion = async (id: string) => {
-    if (!confirm("هل أنت متأكد من حذف هذا السؤال؟")) return;
-    setDeletingId(id);
+  const deleteQuestion = async () => {
+    if (!questionToDelete) return;
+    setDeletingId(questionToDelete.id);
+    setFeedback(null);
     try {
-      await apiFetch(`/teacher/question-bank/${id}`, { method: "DELETE" });
-      setQuestionsList(questionsList.filter((q) => q.id !== id));
+      await apiFetch(`/teacher/question-bank/${questionToDelete.id}`, { method: "DELETE" });
+      setQuestionsList(questionsList.filter((q) => q.id !== questionToDelete.id));
+      setQuestionToDelete(null);
     } catch (err) {
-      alert("فشل في حذف السؤال");
+      setFeedback({ tone: "error", message: "فشل في حذف السؤال" });
     } finally {
       setDeletingId(null);
     }
@@ -61,6 +68,7 @@ export default function TeacherQuestionBank({ loaderData }: Route.ComponentProps
 
   const handleAddQuestion = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setFeedback(null);
     const formData = new FormData(e.currentTarget);
     const questionText = formData.get("questionText") as string;
     const options = [
@@ -80,39 +88,57 @@ export default function TeacherQuestionBank({ loaderData }: Route.ComponentProps
       if (res?.question) {
         setQuestionsList([res.question, ...questionsList]);
         setShowAddModal(false);
+        setFeedback({ tone: "success", message: "تمت إضافة السؤال إلى بنك الأسئلة." });
       }
     } catch (err: any) {
-      alert(err.message || "فشل في إضافة السؤال");
+      setFeedback({ tone: "error", message: err.message || "فشل في إضافة السؤال" });
     }
   };
 
   return (
     <div className="text-right">
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-6 border-b border-slate-200 gap-4">
+      {feedback && (
+        <FeedbackBanner
+          tone={feedback.tone}
+          message={feedback.message}
+          className="mb-6"
+        />
+      )}
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-6 border-b border-slate-200 gap-6">
         <div>
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">بنك الأسئلة</h2>
           <p className="text-slate-500 mt-2 text-lg">قم بإدارة أسئلتك واستخدامها في اختباراتك.</p>
         </div>
         
         {/* Search */}
-        <div className="relative order-last md:order-none">
-          <svg className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            placeholder="ابحث في الأسئلة..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pr-10 pl-4 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 w-64"
-          />
+        <div className="order-last md:order-none w-full md:w-auto">
+          <label htmlFor={searchId} className="mb-2 block text-sm font-bold text-slate-700">
+            ابحث في بنك الأسئلة
+          </label>
+          <div className="relative">
+            <svg className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              id={searchId}
+              type="text"
+              placeholder="ابحث في الأسئلة..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              aria-describedby={`${searchId}-hint`}
+              className="w-full md:w-72 pr-10 pl-4 py-3 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+          </div>
+          <span id={`${searchId}-hint`} className="sr-only">
+            يمكنك البحث بنص السؤال أو بأي خيار من خيارات الإجابة.
+          </span>
         </div>
 
-        <div className="flex items-center gap-3 flex-row-reverse">
+        <div className="flex w-full md:w-auto flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-row-reverse">
           {canAddQuestion && (
             <button
               onClick={() => setShowAddModal(true)}
-              className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-black rounded-xl text-white bg-primary-600 hover:bg-primary-700 focus:outline-none shadow-lg shadow-primary-100 transition-all transform hover:-translate-y-0.5 cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 border border-transparent text-sm font-black rounded-xl text-white bg-primary-600 hover:bg-primary-700 focus:outline-none shadow-lg shadow-primary-100 transition-all transform hover:-translate-y-0.5 cursor-pointer"
             >
               <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -122,7 +148,7 @@ export default function TeacherQuestionBank({ loaderData }: Route.ComponentProps
           )}
           <Link
             to="/teacher/question-bank/ocr"
-            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-black rounded-xl text-white bg-primary-600 hover:bg-primary-700 focus:outline-none shadow-lg shadow-primary-100 transition-all transform hover:-translate-y-0.5"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 border border-transparent text-sm font-black rounded-xl text-white bg-primary-600 hover:bg-primary-700 focus:outline-none shadow-lg shadow-primary-100 transition-all transform hover:-translate-y-0.5"
           >
             <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -136,7 +162,7 @@ export default function TeacherQuestionBank({ loaderData }: Route.ComponentProps
       {/* Add Question Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl p-5 sm:p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-black text-slate-900 mb-6">إضافة سؤال جديد</h3>
             <form onSubmit={handleAddQuestion} className="space-y-4">
               <div>
@@ -149,7 +175,7 @@ export default function TeacherQuestionBank({ loaderData }: Route.ComponentProps
                   placeholder="اكتب السؤال..."
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {["أ", "ب", "ج", "د"].map((label, idx) => (
                   <div key={idx} className="relative">
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-slate-400">{label}</span>
@@ -164,7 +190,7 @@ export default function TeacherQuestionBank({ loaderData }: Route.ComponentProps
               </div>
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">الإجابة الصحيحة</label>
-                <div className="flex gap-4">
+                <div className="grid grid-cols-2 sm:flex gap-4">
                   {["أ", "ب", "ج", "د"].map((label, idx) => (
                     <label key={idx} className="flex items-center gap-2 cursor-pointer">
                       <input type="radio" name="correctOption" value={idx} required className="text-primary-600" />
@@ -173,7 +199,7 @@ export default function TeacherQuestionBank({ loaderData }: Route.ComponentProps
                   ))}
                 </div>
               </div>
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
@@ -266,9 +292,10 @@ export default function TeacherQuestionBank({ loaderData }: Route.ComponentProps
                   </div>
                 </div>
                 <button
-                  onClick={() => deleteQuestion(q.id)}
+                  onClick={() => setQuestionToDelete(q)}
                   disabled={deletingId === q.id}
                   className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors mr-2 disabled:opacity-50 cursor-pointer"
+                  aria-label={`حذف السؤال رقم ${index + 1}: ${q.questionText.slice(0, 60)}`}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -279,24 +306,24 @@ export default function TeacherQuestionBank({ loaderData }: Route.ComponentProps
                 {["أ", "ب", "ج", "د"].map((label, optIdx) => (
                   <div
                     key={optIdx}
-                    className={`flex items-center p-3 rounded-xl ${
+                    className={`flex items-start sm:items-center p-3 rounded-xl ${
                       optIdx === q.correctOption
-                        ? "bg-green-50 border border-green-200"
+                        ? "bg-success-50 border border-success-200"
                         : "bg-slate-50 border border-slate-200"
                     }`}
                   >
                     <span
                       className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-bold ml-3 ${
-                        optIdx === q.correctOption ? "bg-green-500 text-white" : "bg-slate-200 text-slate-600"
+                        optIdx === q.correctOption ? "bg-success-500 text-white" : "bg-slate-200 text-slate-600"
                       }`}
                     >
                       {label}
                     </span>
-                    <span className={optIdx === q.correctOption ? "text-green-700 font-semibold" : "text-slate-700"}>
+                    <span className={optIdx === q.correctOption ? "text-success-700 font-semibold" : "text-slate-700"}>
                       {q.options[optIdx]}
                     </span>
                     {optIdx === q.correctOption && (
-                      <svg className="w-5 h-5 text-green-500 mr-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-success-500 mr-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     )}
@@ -305,13 +332,32 @@ export default function TeacherQuestionBank({ loaderData }: Route.ComponentProps
               </div>
               {q.imageUrl && (
                 <div className="mt-4">
-                  <img src={q.imageUrl} alt="Question image" className="max-w-xs rounded-lg border border-slate-200" />
+                  <img
+                    src={q.imageUrl}
+                    alt={`صورة مرفقة بالسؤال: ${q.questionText}`}
+                    className="max-w-xs rounded-lg border border-slate-200"
+                  />
                 </div>
               )}
             </div>
           ))}
         </div>
       )}
+      <ConfirmDialog
+        open={questionToDelete !== null}
+        title="حذف السؤال"
+        description={
+          questionToDelete
+            ? `سيتم حذف هذا السؤال من بنك الأسئلة ولن يعود متاحاً للاستخدام في الاختبارات الجديدة.`
+            : ""
+        }
+        confirmLabel="حذف السؤال"
+        busy={deletingId === questionToDelete?.id}
+        onCancel={() => {
+          if (deletingId !== questionToDelete?.id) setQuestionToDelete(null);
+        }}
+        onConfirm={deleteQuestion}
+      />
     </div>
   );
 }
