@@ -38,6 +38,13 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
   const [loadingBank, setLoadingBank] = useState(false);
   const [feedback, setFeedback] = useState<{ tone: "error" | "success" | "info"; message: string } | null>(null);
 
+  // OCR State
+  const [showOcrModal, setShowOcrModal] = useState(false);
+  const [ocrLoading, setOcrLoading] = useState(false);
+  const [ocrFile, setOcrFile] = useState<File | null>(null);
+  const [ocrPreview, setOcrPreview] = useState<string | null>(null);
+  const [ocrError, setOcrError] = useState<string | null>(null);
+
   const fetchBankQuestions = async () => {
     setLoadingBank(true);
     setFeedback(null);
@@ -141,6 +148,48 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
     }
   };
 
+  const handleOcrExtract = async () => {
+    if (!ocrFile) return;
+    setOcrLoading(true);
+    setOcrError(null);
+    try {
+      const formData = new FormData();
+      formData.append("image", ocrFile);
+
+      const response = await fetch(`${API_BASE}/teacher/ocr/extract`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "فشل استخراج الأسئلة");
+
+      if (data.questions && data.questions.length > 0) {
+        const newQuestions = data.questions.map((q: any) => ({
+          text: q.questionText,
+          options: q.options,
+          correctOption: q.correctOption,
+          imageUrl: null,
+        }));
+
+        // Remove the initial empty question if it's there
+        const currentQuestions = questions.length === 1 && !questions[0].text ? [] : questions;
+        setQuestions([...currentQuestions, ...newQuestions]);
+        setShowOcrModal(false);
+        setOcrFile(null);
+        setOcrPreview(null);
+        setFeedback({ tone: "success", message: `تم استخراج ${data.questions.length} أسئلة بنجاح.` });
+      } else {
+        setOcrError("لم يتم العثور على أسئلة في الملف.");
+      }
+    } catch (err: any) {
+      setOcrError(err.message || "حدث خطأ أثناء الاستخراج");
+    } finally {
+      setOcrLoading(false);
+    }
+  };
+
   const inputCls = "block w-full border border-slate-300 rounded-lg shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm text-right";
 
   return (
@@ -223,10 +272,16 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
             <h3 className="text-lg font-bold text-slate-900">الأسئلة ({questions.length})</h3>
             <div className="flex items-center gap-3">
               {limits?.questionBank && (
-                <button type="button" onClick={openBankModal} className="inline-flex items-center px-4 py-2 text-sm font-bold rounded-lg text-success-700 bg-success-50 hover:bg-success-100 transition-colors cursor-pointer border border-success-200">
-                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                  استيراد من بنك الأسئلة
-                </button>
+                <>
+                  <button type="button" onClick={() => setShowOcrModal(true)} className="inline-flex items-center px-4 py-2 text-sm font-bold rounded-lg text-primary-700 bg-primary-50 hover:bg-primary-100 transition-colors cursor-pointer border border-primary-200">
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    إضافة من مستند (OCR)
+                  </button>
+                  <button type="button" onClick={openBankModal} className="inline-flex items-center px-4 py-2 text-sm font-bold rounded-lg text-success-700 bg-success-50 hover:bg-success-100 transition-colors cursor-pointer border border-success-200">
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                    استيراد من بنك الأسئلة
+                  </button>
+                </>
               )}
               <button type="button" onClick={addQuestion} className="inline-flex items-center px-4 py-2 text-sm font-bold rounded-lg text-primary-600 bg-primary-50 hover:bg-primary-100 transition-colors cursor-pointer">
                 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -405,6 +460,83 @@ export default function TeacherCreateQuiz({ loaderData }: Route.ComponentProps) 
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* OCR Modal */}
+      {showOcrModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl overflow-hidden text-right">
+            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 flex-row-reverse">
+              <h3 className="font-bold text-lg text-slate-900">إضافة من مستند</h3>
+              <button type="button" onClick={() => setShowOcrModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            
+            <div className="p-6">
+              <div className="mb-6">
+                <div 
+                  onClick={() => document.getElementById("ocr-upload-input")?.click()}
+                  className="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center hover:border-primary-400 transition-colors cursor-pointer"
+                >
+                  <input 
+                    id="ocr-upload-input"
+                    type="file" 
+                    accept="image/*,.pdf" 
+                    className="hidden" 
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setOcrFile(file);
+                        const reader = new FileReader();
+                        reader.onload = (e) => setOcrPreview(e.target?.result as string);
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                  {ocrPreview ? (
+                    <img src={ocrPreview} alt="Preview" className="max-w-full max-h-48 rounded-xl border border-slate-200 mx-auto" />
+                  ) : (
+                    <>
+                      <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                      </div>
+                      <p className="text-slate-600 font-bold mb-1">انقر لرفع صورة أو مستند</p>
+                      <p className="text-slate-400 text-xs">JPG, PNG, PDF</p>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {ocrError && (
+                <div className="mb-4 p-3 bg-danger-50 border border-danger-100 text-danger-600 text-sm font-bold rounded-lg">{ocrError}</div>
+              )}
+
+              <div className="flex gap-3">
+                <button 
+                  type="button" 
+                  disabled={!ocrFile || ocrLoading}
+                  onClick={handleOcrExtract}
+                  className="flex-1 py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 disabled:opacity-50 transition-all cursor-pointer flex items-center justify-center"
+                >
+                  {ocrLoading ? (
+                    <>
+                      <svg className="animate-spin w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+                      جاري الاستخراج...
+                    </>
+                  ) : "بدء الاستخراج"}
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setShowOcrModal(false)}
+                  className="px-6 py-3 border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  إلغاء
+                </button>
+              </div>
             </div>
           </div>
         </div>
