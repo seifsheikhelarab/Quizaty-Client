@@ -270,7 +270,7 @@ export default function LandingPage() {
     return (
         <div className="min-h-screen bg-linear-to-b from-slate-50 to-white overflow-x-hidden">
             {/* Navbar */}
-            <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 shadow-[0_1px_0_rgba(15,23,42,0.04)] animate-reveal-down">
+            <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 shadow-sm animate-reveal-down">
                 <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2 sm:gap-3 group cursor-pointer">
                         <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-600 sm:h-10 sm:w-10">
@@ -431,6 +431,27 @@ export default function LandingPage() {
                             </div>
                         </section>
 
+                        <section className="max-w-6xl mx-auto px-6 py-12 sm:py-16 opacity-0 animate-reveal-up delay-500">
+                            <div className="rounded-[2.5rem] bg-gradient-to-br from-primary-600 to-primary-700 p-8 sm:p-12 text-center text-white">
+                                <h2 className="text-2xl sm:text-3xl font-black mb-8">
+                                    أرقام تتحدث عنا
+                                </h2>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                                    {[
+                                        { num: "10K+", label: "معلم يستخدمنا" },
+                                        { num: "500K+", label: "طالب لأداء الاختبارات" },
+                                        { num: "2M+", label: "اختبار تم إنشاؤه" },
+                                        { num: "99.9%", label: "وقت التشغيل" },
+                                    ].map((stat, i) => (
+                                        <div key={i} className="text-center">
+                                            <div className="text-3xl sm:text-4xl font-black mb-1">{stat.num}</div>
+                                            <div className="text-white/80 text-sm font-medium">{stat.label}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
                         <section className="max-w-6xl mx-auto px-6 py-16 sm:py-24 opacity-0 animate-reveal-up delay-400">
                             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 text-center mb-16">
                                 لماذا Quizaty؟
@@ -438,26 +459,38 @@ export default function LandingPage() {
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                                 {[
                                     {
-                                        icon: "⚡",
+                                        icon: (
+                                            <svg className="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            </svg>
+                                        ),
                                         title: "سريع وسهل",
                                         desc: "أنشئ اختبارك في دقائق معدودة بواجهة بسيطة وبديهية.",
                                     },
                                     {
-                                        icon: "✅",
+                                        icon: (
+                                            <svg className="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        ),
                                         title: "تصحيح تلقائي",
                                         desc: "النتائج جاهزة فوراً بعد التقديم مع تحليل شامل للأداء.",
                                     },
                                     {
-                                        icon: "🔒",
+                                        icon: (
+                                            <svg className="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                        ),
                                         title: "حماية من الغش",
                                         desc: "أنظمة متقدمة لمنع الغش وضمان نزاهة الاختبارات.",
                                     },
                                 ].map((f, i) => (
                                     <div
                                         key={i}
-                                        className="rounded-3xl border border-slate-200 bg-white p-8 text-center transition-colors cursor-default"
+                                        className="rounded-3xl border border-slate-200 bg-white p-8 text-center transition-all hover:border-primary-200 hover:shadow-lg cursor-default"
                                     >
-                                        <div className="mb-5 inline-block text-4xl">
+                                        <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-50">
                                             {f.icon}
                                         </div>
                                         <h3 className="mb-3 text-xl font-black text-slate-900">
@@ -466,6 +499,28 @@ export default function LandingPage() {
                                         <p className="text-slate-500 font-medium leading-relaxed">
                                             {f.desc}
                                         </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        <section className="max-w-6xl mx-auto px-6 py-12 sm:py-16 opacity-0 animate-reveal-up delay-500">
+                            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 text-center mb-4">
+                                لمن؟
+                            </h2>
+                            <p className="text-slate-500 text-center max-w-xl mx-auto mb-12">
+                                Quizaty مصممة خصيصاً للمعلمين والطلاب في مصر
+                            </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+                                {[
+                                    { emoji: "👨‍🏫", text: "معلمو المرحلة الابتدائية والإعدادية والثانوية" },
+                                    { emoji: "👩‍🏫", text: "معلمو الجامعات والمعاهد الخاصة" },
+                                    { emoji: "📚", text: "معاهد اللغات ومراكز التدريب" },
+                                    { emoji: "🏫", text: "مدارس الحكومية والخاصة" },
+                                ].map((item, i) => (
+                                    <div key={i} className="flex items-center gap-4 bg-white rounded-2xl border border-slate-200 p-5 text-right">
+                                        <span className="text-3xl">{item.emoji}</span>
+                                        <span className="font-bold text-slate-700">{item.text}</span>
                                     </div>
                                 ))}
                             </div>
@@ -577,8 +632,8 @@ export default function LandingPage() {
                                     </div>
                                 ))}
                             </div>
-                            <div className="hidden lg:block overflow-x-auto">
-                                <table className="w-full text-right">
+<div className="overflow-x-auto">
+                                <table className="w-full text-right min-w-[600px]">
                                     <caption className="sr-only">
                                         جدول مقارنة يوضح الفروق بين الباقات من حيث السعر الشهري وعدد الطلاب والاختبارات والمزايا المتاحة.
                                     </caption>

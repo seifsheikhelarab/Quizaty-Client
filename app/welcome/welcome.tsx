@@ -9,13 +9,17 @@ export function Welcome() {
           <div className="w-[500px] max-w-[100vw] p-4">
             <img
               src={logoLight}
-              alt="React Router"
+              alt="Quizaty Logo"
               className="block w-full dark:hidden"
+              loading="eager"
+              fetchPriority="high"
             />
             <img
               src={logoDark}
-              alt="React Router"
+              alt="Quizaty Logo"
               className="hidden w-full dark:block"
+              loading="eager"
+              fetchPriority="high"
             />
           </div>
         </header>

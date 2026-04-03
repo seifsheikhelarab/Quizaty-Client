@@ -587,7 +587,7 @@ export default function StudentQuizTest({ loaderData }: Route.ComponentProps) {
             aria-modal="true"
             aria-labelledby="submit-quiz-title"
             aria-describedby="submit-quiz-description"
-            className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_18px_36px_-28px_rgba(15,23,42,0.35)]"
+            className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-xl"
           >
             <h2 id="submit-quiz-title" className="text-xl font-black text-slate-900">
               تأكيد تسليم الاختبار

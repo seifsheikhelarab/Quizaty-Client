@@ -10,7 +10,6 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import { FullPageSpinner } from "./components/Spinner";
 
 export const links: Route.LinksFunction = () => [
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -41,12 +40,20 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Links />
             </head>
             <body suppressHydrationWarning>
+                <a
+                    href="#main-content"
+                    className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:right-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded-lg focus:font-medium"
+                >
+                    الانتقال للمحتوى الرئيسي
+                </a>
                 {isLoading && (
                     <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-primary-100/80 overflow-hidden backdrop-blur-sm">
-                        <div className="h-full bg-linear-to-l from-secondary-500 via-primary-500 to-primary-600 animate-loading-bar shadow-[0_0_14px_color-mix(in_srgb,var(--color-primary-500)_40%,transparent)]"></div>
+                        <div className="h-full bg-primary-600 animate-loading-bar"></div>
                     </div>
                 )}
-                {children}
+                <main id="main-content">
+                    {children}
+                </main>
                 <ScrollRestoration />
                 <Scripts />
             </body>
@@ -59,7 +66,21 @@ export default function App() {
 }
 
 export function HydrateFallback() {
-    return <FullPageSpinner />;
+    return (
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+            <div className="max-w-md w-full space-y-8">
+                <div className="text-center space-y-4">
+                    <div className="w-16 h-16 bg-primary-100 rounded-2xl mx-auto animate-pulse" />
+                    <div className="h-6 bg-slate-200 rounded w-32 mx-auto" />
+                </div>
+                <div className="space-y-3">
+                    <div className="h-12 bg-slate-100 rounded-xl" />
+                    <div className="h-12 bg-slate-100 rounded-xl" />
+                    <div className="h-12 bg-slate-100 rounded-xl" />
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

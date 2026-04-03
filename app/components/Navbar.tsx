@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router";
-import { apiFetch } from "../utils/api";
+import { apiFetch, clearCachedUser } from "../utils/api";
 
 interface NavbarProps {
   userName?: string;
@@ -23,6 +23,7 @@ export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
 
   const handleLogout = async () => {
     await apiFetch("/auth/logout", { method: "POST" });
+    clearCachedUser();
     window.location.href = "/login";
   };
 
@@ -40,7 +41,7 @@ export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
       ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 shadow-[0_1px_0_rgba(15,23,42,0.05)] opacity-0 animate-reveal-down">
+    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 shadow-sm opacity-0 animate-reveal-down">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link
@@ -140,7 +141,7 @@ export function Navbar({ userName, role, backUrl, backText }: NavbarProps) {
           />
           <div
             id={mobileMenuId}
-            className="absolute top-16 left-0 right-0 z-40 overflow-hidden border-b border-slate-200 bg-white shadow-[0_12px_24px_-20px_rgba(15,23,42,0.28)] md:hidden animate-reveal-down"
+            className="absolute top-16 left-0 right-0 z-40 overflow-hidden border-b border-slate-200 bg-white shadow-lg md:hidden animate-reveal-down"
           >
             <nav className="flex flex-col p-6 space-y-1" aria-label="التنقل الرئيسي للجوال">
               {navLinks.map((link, i) => (
