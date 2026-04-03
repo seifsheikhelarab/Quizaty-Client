@@ -161,7 +161,7 @@ export default function TeacherQuizzes({ loaderData }: Route.ComponentProps) {
             return (
               <div 
                 key={quiz.id} 
-                className={`group bg-white rounded-[2rem] border border-slate-200 p-7 flex flex-col hover:border-primary-200 transition-colors duration-300 opacity-0 animate-reveal-up ${
+                className={`group bg-white rounded-4xl border border-slate-200 p-7 flex flex-col hover:border-primary-200 transition-colors duration-300 opacity-0 animate-reveal-up ${
                   i % 4 === 0 ? "delay-100" : i % 4 === 1 ? "delay-150" : i % 4 === 2 ? "delay-200" : "delay-250"
                 }`}
               >
@@ -194,7 +194,7 @@ export default function TeacherQuizzes({ loaderData }: Route.ComponentProps) {
                   </div>
                 </Link>
 
-                <div className="mt-auto pt-8 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 flex-row-reverse">
+                <div className="mt-auto pt-8 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div className="flex w-full sm:w-auto gap-3">
                     <Link 
                       to={`/teacher/quizzes/${quiz.id}`} 
